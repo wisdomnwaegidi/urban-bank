@@ -1,0 +1,135 @@
+/*=========================== bw_login_page_section ===========================*/
+
+.bw_login_page_section {
+    display: flex;
+    align-items: center;
+}
+.bw_regisiter_wrap, .bw_login_wrap, .bw_forgot_password_wrap, .bw_reset_password_wrap {
+    display: none;
+    width: 100%;
+}
+.bw_regisiter_wrap.active, .bw_login_wrap.active, .bw_forgot_password_wrap.active, .bw_reset_password_wrap.active {
+    display: block;
+}
+
+.bw_login_page_section .bw_sub_title,
+.bw_login_page_section .bw_dec_title {
+    text-align: center;
+}
+.bw_login_page_section .bw_sub_title {
+    margin-bottom: 35px;
+}
+
+.bw_login_page_section form {
+    background: var(--bg_othe_1);
+    border-radius: 20px;
+    padding: 50px;
+    max-width: 592px;
+    width: 100%;
+    margin: 0 auto;
+}
+.bw_login_page_section p {
+    font-size: 14px;
+    line-height: 24px;
+}
+.bw_login_page_section .bw_custom_input,
+.bw_login_page_section .bw_custom_buttom,
+.bw_regisiter_wrap .bw_pass_dec {
+    margin-bottom: 20px;
+}
+.bw_login_page_section p>a {
+    background: var(--text_gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    transition: 0.5s all ease;
+    font-weight: 600;
+}
+.bw_login_page_section p>a:hover {
+    background: var(--text_gradient_hover);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+.bw_regisiter_wrap .bw_sub_title {
+    margin-bottom: 15px;
+}
+.bw_regisiter_wrap .bw_dec_title {
+    max-width: 361px;
+    width: 100%;
+    margin: 0 auto 20px;
+    font-size: 16px;
+    line-height: 26px;
+}
+.bw_checkbox_and_forgot_text {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    grid-gap: 10px;
+    margin-bottom: 20px;
+}
+.bw_checkbox_and_forgot_text .bw_forgot_cilck {
+    font-family: var(--font_family_2);
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--input_color);
+}
+.bw_checkbox_and_forgot_text .bw_forgot_cilck:hover {
+    color: var(--text_white);
+}
+body.login .bw_main_body .bw_content {
+    padding: 120px 0 100px;
+}
+
+/*=========================== bw_login_page_section ===========================*/
+
+/*=========================== maida_css ===========================*/
+
+@media (max-width: 1440px) {
+
+}
+
+@media (max-width: 1366px) {
+
+}
+
+@media (max-width: 1199px) {
+
+}
+
+@media (max-width: 991px) {
+
+}
+
+@media (max-width: 767px) {
+    .bw_login_page_section form {
+        padding: 30px 20px;
+        border-radius: 10px;
+    }
+    .bw_regisiter_wrap .bw_dec_title,
+    .bw_login_page_section p {
+        font-size: 13px;
+        line-height: 22px;
+    }
+    body.login .bw_main_body .bw_content {
+        padding: 100px 0 50px;
+    }
+    .bw_login_page_section .bw_sub_title {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 575px) {
+
+}
+
+@media (max-width: 425px) {
+    .bw_checkbox_and_forgot_text {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+/*=========================== maida_css ===========================*/

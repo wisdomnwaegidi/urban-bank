@@ -1,0 +1,75 @@
+/*=========================== bw_error_page_section ===========================*/
+.bw_error_page_section {
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+.bw_error_page_wrap .bw_description {
+    max-width: 505px;
+    width: 100%;
+    line-height: 26px;
+    margin: 15px auto 48px;
+}
+.error-shape h4 {
+    line-height: 0.7;
+    font-size: 18vw;
+    -webkit-text-fill-color: #222828;
+    -webkit-text-stroke-width: 4px;
+    -webkit-text-stroke-color: rgb(255 255 255 / 50%);
+}
+.error-shape h5 {
+    font-size: 7.4vw;
+    -webkit-text-fill-color: #222828;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: #fff;
+}
+.bw_error_btn {
+    margin: 0 auto;
+    width: fit-content;
+    background: linear-gradient(var(--bg_body), var(--bg_body)) padding-box, linear-gradient(to right, rgba(247, 251, 164, 1), rgba(100, 220, 182, 1)) border-box;
+    border-radius: 25px;
+    border: 1px solid transparent;
+}
+.bw_error_btn .bw_custom_buttom {
+    background: var(--text_gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    display: block;
+    transition: 0.5s all ease;
+}
+.bw_error_btn .bw_custom_buttom:hover {
+    background: var(--text_gradient_hover);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+/*=========================== bw_error_page_section ===========================*/
+
+/*=========================== maida_css ===========================*/
+
+@media (max-width: 767px) {
+    .bw_error_page_wrap .bw_description {
+        margin-bottom: 20px;
+    }
+    .error-shape h4 {
+        line-height: normal;
+        -webkit-text-stroke-width: 2px;
+    }
+    .error-shape h5 {
+        -webkit-text-stroke-width: 1px;
+    }
+}
+
+@media (max-width: 575px) {
+    .error-shape h4 {
+        -webkit-text-stroke-width: 1px;
+    }
+    .error-shape h5 {
+        -webkit-text-stroke-width: 0.5px;
+    }
+}
+
+/*=========================== maida_css ===========================*/

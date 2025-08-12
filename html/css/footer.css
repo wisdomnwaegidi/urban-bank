@@ -1,0 +1,207 @@
+
+/*=========================== bw_footer ===========================*/
+.bw_footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.bw_footer .bw_container {
+    background: var(--bg_othe_1);
+    border-radius: 20px;
+    padding: 55px 50px 0px 65px;
+}
+.bw_footer_main_wrap {
+    display: flex;
+}
+.bw_footer_col {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+}
+.bw_footer_mobile_logo {
+    display: none;
+}
+.bw_footer_title {
+    font-family:var(--font_family_2) ;
+    font-weight: 500;
+    font-size: 18px;
+    color: var(--text_white);
+    margin-bottom: 10px;
+}
+.bw_footer ul li a {
+    font-size: 14px;
+    font-weight: 400;
+    font-family: var(--font_family_1);
+    color: var(--text_paragraph_color);
+    line-height: 24px;
+}
+.bw_footer ul li a:hover {
+    color: var(--text_hover);
+}
+.bw_footer_col h4 {
+    font-family: var(--font_family_2);
+    font-weight: 600;
+    font-size: 27px;
+    color: var(--text_white);
+    margin-bottom: 28px;
+}
+.bw_footer_col.second {
+    justify-content: end;
+}
+.bw_mf_email_wrap {
+    max-width: 391px;
+    width: 100%;
+}
+.bw_footer_wrap {
+    width: 100%;
+}
+.mf_email_box {
+    display: flex;
+    align-items: center;
+    padding-bottom: 17px;
+    border-bottom: 1px solid var(--border_color);
+}
+.mf_email_box input {
+    font-family: var(--font_family_1);
+    font-weight: 300;
+    font-size: 14px;
+    color: var(--text_paragraph_color);
+    background: var(--bg_transparent);
+    border: 0;
+    width: 100%;
+}
+.mf_email_box input::-webkit-input-placeholder {
+    color: var(--input_color);
+}
+.mf_email_box input:-ms-input-placeholder {
+    color: var(--input_color);
+}
+.mf_email_box input::placeholder {
+    color: var(--input_color);
+}
+.mf_email_box .bw_custom_buttom {
+    padding: 9px 25px;
+    font-size: 16px;
+}
+.bw_copy_right_content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border_color);
+    margin-top: 85px;
+    padding: 18px 0 24px;
+}
+.bw_footer_logo_content img {
+    vertical-align: middle;
+}
+.bw_copy_right_content p,
+.bw_copy_right_content p a {
+    font-weight: 300;
+    font-size: 14px;
+    color: rgba(241, 241, 241, 0.50);
+}
+
+
+/*=========================== bw_footer ===========================*/
+
+/*=========================== maida_css ===========================*/
+
+@media (max-width: 1024px) {
+    .bw_footer .bw_container {
+        padding: 30px 20px 0px 20px
+    }
+    .bw_copy_right_content {
+        margin-top: 50px;
+    }
+}
+
+@media (max-width: 991px) {
+    .bw_footer_col {
+        flex-wrap: wrap;
+        grid-gap: 20px;
+    }
+    .bw_footer_wrap {
+        width: calc(50% - 10px);
+    }
+    .bw_footer_col h4 {
+        font-size: 25px;
+    }
+}
+
+@media (max-width: 767px) {
+    .bw_copy_right_content {
+        margin-top: 30px;
+        padding: 16px 0;
+    }
+    .bw_footer_col h4 {
+        font-size: 22px;
+    }
+    .mf_email_box .bw_custom_buttom {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 575px) {
+    .bw_footer_main_wrap {
+        flex-wrap: wrap;justify-content: center;
+    }
+    .bw_footer_col h4 {
+        font-size: 20px;
+        margin-bottom: 18px;
+    }
+    .bw_mf_email_wrap {
+        max-width: 100%;
+    }
+    .bw_footer_mobile_logo {
+        display: block;
+        margin-bottom: 25px;
+    }
+    .bw_copy_right_content .bw_footer_logo_content {
+        display: none;
+    }
+    .bw_footer_wrap {
+        width: calc(32% - 10px);
+    }
+    .bw_footer_mobile_logo a {
+        max-width: 160px;
+        display: block;
+    }
+    .bw_footer_col.second {
+        margin-top: 25px;
+    }
+    .mf_email_box {
+        border-bottom: none;
+    }
+    .bw_copy_right_content {
+        margin-top: 0;
+    }
+
+}
+
+@media (max-width: 425px) {
+    .bw_footer_logo_content a {
+        max-width: 150px;
+        display: block;
+        padding-right: 10px;
+    }
+    .bw_faq_section .bw_faq_content {
+        margin-bottom: 20px;
+    }
+
+}
+@media (max-width: 375px) {
+    .bw_footer_wrap {
+        width: calc(50% - 10px);
+    }
+
+}
+
+/*=========================== maida_css ===========================*/
+
+
+
+
