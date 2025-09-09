@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local Transfer</title>
+    <!-- Font Awesome CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/transferlocal.css" />
+  </head>
+  <body>
+    <%- include('partials/toast') %>
+    
+    <section class="transfer-section">
+      <h2 class="transfer-title">Local Transfer</h2>
+
+      <!-- Account Info -->
+      <div class="account-info">
+        <p>
+          <strong>Your Account Balance:</strong>
+          <span id="accountBalance">
+            $<%= user ? user.accountBalance.toLocaleString() : "0.00" %>
+          </span>
+          <i
+            id="toggleBalance"
+            class="fa fa-eye"
+            aria-hidden="true"
+            style="cursor: pointer; margin-left: 10px"
+          ></i>
+        </p>
+        <p>
+          <strong>Your Account Number:</strong>
+          <%= user ? user.account : "N/A" %>
+        </p>
+      </div>
+
+      <!-- Dynamic Date -->
+      <p>
+        <strong>Date:</strong>
+        <span id="transferDate"><%= new Date().toISOString().split("T")[0] %></span>
+      </p>
+
+      <form action="/transfers/local" class="transfer-form">
+        <input
+          type="text"
+          name="beneficiaryName"
+          placeholder="Beneficiary Name"
+          required
+        />
+        <input
+          type="text"
+          name="beneficiaryAccount"
+          placeholder="Account Number"
+          required
+        />
+        <input
+          type="text"
+          name="beneficiaryBank"
+          placeholder="Bank Name"
+          required
+        />
+
+        <input
+          type="number"
+          name="amount"
+          id="amount"
+          placeholder="Amount"
+          required
+        />
+
+        <!-- Charges below Amount -->
+        <div class="charges-container">
+          <span id="charges">Charges: $7</span>
+        </div>
+
+        <!-- Find Beneficiary Button -->
+        <button type="button" class="btn-find" id="findBeneficiary">
+          Find Beneficiary
+        </button>
+
+        <textarea name="description" placeholder="Description"></textarea>
+
+        <!-- Toggle Save Beneficiary -->
+        <div class="toggle-container">
+          <span>Save Beneficiary?</span>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              name="saveBeneficiary"
+              id="saveBeneficiary"
+            />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-transfer">Send Transfer</button>
+      </form>
+    </section>
+
+    <!-- Beneficiary Modal -->
+    <div class="beneficiaryModal" id="beneficiaryModal">
+      <div class="modal-content">
+        <span class="close-modal" id="ModalClose">&times;</span>
+        <h3>Select Beneficiary</h3>
+        <ul>
+          <% if (user && user.beneficiaries && user.beneficiaries.length > 0) { %>
+            <% user.beneficiaries.forEach(b => { %>
+              <li data-name="<%= b.name %>" data-account="<%= b.accountNumber %>" data-bank="<%= b.bank %>">
+                <%= b.name %> - <%= b.accountNumber %> (<%= b.bank %>)
+              </li>
+            <% }) %>
+          <% } else { %>
+            <li>No saved beneficiaries</li>
+          <% } %>
+        </ul>
+      </div>
+    </div>
+
+    <script src="/js/toggleBalance.js"></script>
+    <script src="/js/transferlocal.js"></script>
+  </body>
+</html>

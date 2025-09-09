@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Cards</title>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/cards.css" />
+  </head>
+  <body>
+    <%- include('partials/toast') %>
+
+    <div class="content">
+      <div class="grid two">
+        <!-- Existing Card -->
+        <div class="card">
+          <div class="card__head">
+            <h2>My Card</h2>
+          </div>
+          <div class="card-visual">
+            <div class="row">
+              <span><%= card ? card.type : 'Debit' %></span>
+              <img
+                src="/image/hd-mastercard-payment-logo-transparent.png"
+                alt="MasterCard"
+                class="card-logo"
+              />
+            </div>
+            <div class="digits">
+              <%= card ? card.number : '**** **** **** ****' %>
+            </div>
+            <div class="row">
+              <span>CVV: <%= card ? card.cvv : 'xxx' %></span>
+              <span>Expiry: <%= card ? card.expiry : 'xx/xx' %></span>
+            </div>
+            <div class="row name">
+              <strong>
+                <%= user ? user.firstName + " " + user.lastName : "Full Name" %>
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Apply for Card -->
+        <div class="card action">
+          <h3>Apply for New Card</h3>
+          <form id="cardForm">
+            <label>
+              Card Network
+              <select name="network" required>
+                <option value="MasterCard">Master Card</option>
+                <option value="Visa">Visa</option>
+                <option value="Verve">Verve</option>
+              </select>
+            </label>
+            <label>
+              Card Type
+              <select name="type" required>
+                <option value="Debit">Debit</option>
+                <option value="Credit">Credit</option>
+                <option value="Prepaid">Prepaid</option>
+              </select>
+            </label>
+            <button type="submit" class="cardsbtn">Apply for card</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

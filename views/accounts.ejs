@@ -1,0 +1,156 @@
+<!-- Page Header -->
+<section class="welcome">
+  <h1>Account Management</h1>
+  <p>Manage your accounts and view detailed information</p>
+</section>
+
+<!-- Account Summary -->
+<section class="grid three" aria-label="Account Summary">
+  <article class="card">
+    <h2>Checking Account</h2>
+    <p><strong>Account Number:</strong> 1043112016</p>
+    <div class="balance">$666,000.00</div>
+    <p><small>Available Balance</small></p>
+    <button class="btn btn-primary" style="margin-top: 10px">
+      View Details
+    </button>
+  </article>
+
+  <article class="card">
+    <h2>Savings Account</h2>
+    <p><strong>Account Number:</strong> 2043112017</p>
+    <div class="balance">$125,450.75</div>
+    <p><small>Available Balance</small></p>
+    <button class="btn btn-primary" style="margin-top: 10px">
+      View Details
+    </button>
+  </article>
+
+  <article class="card">
+    <h2>Investment Account</h2>
+    <p><strong>Account Number:</strong> 3043112018</p>
+    <div class="balance">$89,230.25</div>
+    <p><small>Portfolio Value</small></p>
+    <button class="btn btn-primary" style="margin-top: 10px">
+      View Details
+    </button>
+  </article>
+</section>
+
+<!-- Account Activity -->
+<section class="card" aria-label="Account Activity">
+  <div
+    style="
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    "
+  >
+    <h2>Account Activity</h2>
+    <div>
+      <select
+        style="
+          margin-right: 10px;
+          padding: 5px 10px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+        "
+      >
+        <option>All Accounts</option>
+        <option>Checking (1043112016)</option>
+        <option>Savings (2043112017)</option>
+        <option>Investment (3043112018)</option>
+      </select>
+      <button class="btn btn-outline">Export</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Account</th>
+          <th>Description</th>
+          <th>Amount</th>
+          <th>Type</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2024-11-15</td>
+          <td>1043112016</td>
+          <td>Online Purchase - Amazon</td>
+          <td>-89.99</td>
+          <td><span class="badge badge-danger">Debit</span></td>
+          <td>$666,000.00</td>
+        </tr>
+        <tr>
+          <td>2024-11-14</td>
+          <td>2043112017</td>
+          <td>Interest Payment</td>
+          <td>+125.50</td>
+          <td><span class="badge badge-success">Credit</span></td>
+          <td>$125,450.75</td>
+        </tr>
+        <tr>
+          <td>2024-11-13</td>
+          <td>1043112016</td>
+          <td>Salary Deposit</td>
+          <td>+3200.00</td>
+          <td><span class="badge badge-success">Credit</span></td>
+          <td>$666,089.99</td>
+        </tr>
+        <tr>
+          <td>2024-11-12</td>
+          <td>3043112018</td>
+          <td>Stock Purchase - AAPL</td>
+          <td>-1500.00</td>
+          <td><span class="badge badge-danger">Investment</span></td>
+          <td>$89,230.25</td>
+        </tr>
+        <tr>
+          <td>2024-11-11</td>
+          <td>1043112016</td>
+          <td>ATM Withdrawal</td>
+          <td>-200.00</td>
+          <td><span class="badge badge-danger">Debit</span></td>
+          <td>$662,889.99</td>
+        </tr>
+        <tr>
+          <td>2024-11-10</td>
+          <td>2043112017</td>
+          <td>Transfer from Checking</td>
+          <td>+1000.00</td>
+          <td><span class="badge badge-success">Transfer</span></td>
+          <td>$125,325.25</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Account Actions -->
+<section class="grid two" aria-label="Account Actions" style="margin-top: 30px">
+  <article class="card">
+    <h2>Quick Actions</h2>
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <button class="btn btn-primary">Transfer Between Accounts</button>
+      <button class="btn btn-success">Deposit Funds</button>
+      <button class="btn btn-outline">Download Statement</button>
+      <button class="btn btn-outline">Set Up Auto-Transfer</button>
+    </div>
+  </article>
+
+  <article class="card">
+    <h2>Account Settings</h2>
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <button class="btn btn-outline">Update Account Preferences</button>
+      <button class="btn btn-outline">Manage Notifications</button>
+      <button class="btn btn-outline">View Account History</button>
+      <button class="btn btn-outline">Contact Support</button>
+    </div>
+  </article>
+</section>

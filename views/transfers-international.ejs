@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>International Transfer</title>
+    <link rel="stylesheet" href="/css/international-transfer.css" />
+  </head>
+  <body>
+    <section class="transfer-section international-transfer">
+      <h2 class="transfer-title">International Transfer</h2>
+      <form
+        method="POST"
+        action="/transfers/international"
+        class="transfer-form"
+      >
+        <div class="form-group">
+          <label for="recipientName">Recipient Name</label>
+          <input
+            type="text"
+            id="recipientName"
+            name="recipientName"
+            placeholder="Recipient Name"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="iban">IBAN</label>
+          <input
+            type="text"
+            id="iban"
+            name="iban"
+            placeholder="IBAN"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="swift">SWIFT/BIC</label>
+          <input
+            type="text"
+            id="swift"
+            name="swift"
+            placeholder="SWIFT/BIC"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="amount">Amount</label>
+          <input
+            type="number"
+            id="amount"
+            name="amount"
+            placeholder="Amount"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            name="description"
+            placeholder="Description"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-transfer">Send Transfer</button>
+        </div>
+      </form>
+    </section>
+  </body>
+</html>

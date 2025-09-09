@@ -1,0 +1,96 @@
+
+
+.transfer-section {
+  padding: 2rem;
+  background: var(--bg_body);
+  border-radius: 12px;
+  color: var(--text_white);
+  font-family: var(--font_family_1), sans-serif;
+}
+
+.transfer-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  background: var(--text_gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1.5rem;
+}
+
+.transfer-menu {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.transfer-menu .menu-item {
+  color: var(--text_white);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  transition: 0.3s;
+  background: var(--bg_othe_2);
+  border: 1px solid var(--border_color);
+}
+
+.transfer-menu .menu-item:hover,
+.transfer-menu .menu-item.active {
+  background: var(--bg_gradient_hover);
+  color: var(--text_black);
+}
+
+.transfer-card {
+  background: var(--bg_othe_1);
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid var(--border_color);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 600;
+  font-family: var(--font_family_2), sans-serif;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--border_color);
+  background: var(--bg_input_color);
+  color: var(--text_white);
+  font-size: 1rem;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--input_color);
+}
+
+.btn-transfer {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  background: var(--bg_gradient);
+  color: var(--text_black);
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-transfer:hover {
+  background: var(--bg_gradient_hover);
+  color: var(--text_white);
+}

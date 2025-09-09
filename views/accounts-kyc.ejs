@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/accounts-kyc.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- Toast Partial -->
+    <%- include('partials/toast') %>
+
+    <main class="accounts-kyc">
+      <h1 class="page-title">KYC Verification</h1>
+
+      <section class="form-section">
+        <form action="/accounts/kyc" class="kyc-form">
+          <label for="fullname">Full Name</label>
+          <input type="text" id="fullname" name="fullname" required />
+
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" name="dob" required />
+
+          <label for="idType">ID Type</label>
+          <select id="idType" name="idType" required>
+            <option value="passport">Passport</option>
+            <option value="driver">Driver's License</option>
+            <option value="national">National ID</option>
+          </select>
+
+          <label for="idNumber">ID Number</label>
+          <input type="text" id="idNumber" name="idNumber" required />
+
+          <label for="address">Address</label>
+          <textarea id="address" name="address" rows="3" required></textarea>
+
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </section>
+    </main>
+    <script src="/js/kyc.js"></script>
+  </body>
+</html>

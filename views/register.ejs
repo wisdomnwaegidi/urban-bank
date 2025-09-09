@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bank Website</title>
+    <link rel="icon" href="/favicon/five-icon.png" type="image/gif" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <link rel="stylesheet" href="/css/aos.css" />
+    <link rel="stylesheet" href="/css/all.min.css" />
+    <link rel="stylesheet" href="/css/magnific-popup.css" />
+    <link rel="stylesheet" href="/css/swiper-bundle.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/header.css" />
+    <link rel="stylesheet" type="text/css" href="/css/footer.css" />
+    <link rel="stylesheet" type="text/css" href="/css/error.css" />
+    <link rel="stylesheet" type="text/css" href="/css/login.css" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.mixitup.min.js"></script>
+    <script src="/js/waypoints.min.js"></script>
+    <script src="/js/jquery.ripples-min.js"></script>
+    <script src="/js/aos.js"></script>
+    <script src="/js/all.min.js"></script>
+    <script src="/js/jquery.magnific-popup.min.js"></script>
+    <script src="/js/swiper-bundle.min.js"></script>
+    <script src="/js/jquery.counterup.min.js"></script>
+    <script src="/js/chart.min.js"></script>
+    <script src="/js/imask.min.js"></script>
+  </head>
+
+  <body>
+    <%- include('partials/toast') %>
+    
+    <!-- start_bw_menubar_wrap -->
+    <div class="bw_menubar_wrap">
+      <div class="bw_container">
+        <div class="bw_menubar_content">
+          <a class="bw_menubar_close" href="javascript:;">
+            <span class="material-symbols-rounded">close</span>
+          </a>
+          <ul class="bw_menubar_menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About us</a></li>
+            <li><a href="/feature">Feature</a></li>
+            <li class="bw_drop_down_wrap">
+              <a href="javascript:;" class="bw_dropdown_click"
+                >Page <span class="material-symbols-sharp">expand_more</span></a
+              >
+              <ul class="bw_dropdown_menu">
+                <li><a class="bw_dropdown_item" href="/">Home-1</a></li>
+                <li><a class="bw_dropdown_item" href="/index-2">Home-2</a></li>
+                <li><a class="bw_dropdown_item" href="/about">About</a></li>
+                <li>
+                  <a class="bw_dropdown_item" href="/blog-grid-1">Blog-1</a>
+                </li>
+                <li>
+                  <a class="bw_dropdown_item" href="/blog-grid-2">Blog-2</a>
+                </li>
+                <li>
+                  <a class="bw_dropdown_item" href="/blog-grid-3">Blog-3</a>
+                </li>
+                <li>
+                  <a class="bw_dropdown_item" href="/blog-detail-1"
+                    >Blog Detail-1</a
+                  >
+                </li>
+                <li>
+                  <a class="bw_dropdown_item" href="/blog-detail-2"
+                    >Blog Detail-2</a
+                  >
+                </li>
+                <li><a class="bw_dropdown_item" href="/feature">Feature</a></li>
+                <li>
+                  <a class="bw_dropdown_item" href="/feature-detail"
+                    >Feature Detail</a
+                  >
+                </li>
+                <li><a class="bw_dropdown_item" href="/team">Team</a></li>
+                <li><a class="bw_dropdown_item" href="/faq">FAQ-1</a></li>
+                <li><a class="bw_dropdown_item" href="/faq-2">FAQ-2</a></li>
+                <li><a class="bw_dropdown_item" href="/contact">Contact</a></li>
+                <li><a class="bw_dropdown_item" href="/error">Error</a></li>
+                <li><a class="bw_dropdown_item" href="/career">Career</a></li>
+                <li><a class="bw_dropdown_item" href="/pricing">Pricing</a></li>
+                <li>
+                  <a class="bw_dropdown_item" href="/privacy-policy"
+                    >Privacy Policy</a
+                  >
+                </li>
+                <li>
+                  <a class="bw_dropdown_item" href="/bank-special-offers"
+                    >Bank Special Offers</a
+                  >
+                </li>
+                <li><a class="bw_dropdown_item" href="/login">Login</a></li>
+              </ul>
+            </li>
+            <li><a href="/contact">Contact</a></li>
+            <li>
+              <a class="bw_custom_buttom" href="javascript:;"
+                >Open an account</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- close_bw_menubar_wrap -->
+
+    <!-- start_bw_header -->
+    <header class="bw_header">
+      <div class="bw_container">
+        <div class="bw_header_contant">
+          <div class="bw_header_logo_content">
+            <a href="/"><img src="/image/logo.png" alt="" title="logo" /></a>
+          </div>
+          <ul class="bw_all_menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About us</a></li>
+            <li><a href="/feature">Feature</a></li>
+            <li class="bw_header_dropdown">
+              <a href="javascript:;" class="bw_dropdown_hover">Page </a>
+              <!-- <span class="material-symbols-sharp">expand_more</span> -->
+              <div class="bw_header_dropdown_menu">
+                <div class="bw_header_dropdown_menu_title">
+                  <span>Pages</span>
+                </div>
+                <ul>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/">Home-1</a>
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/index-2"
+                      >Home-2</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/about">About</a>
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/blog-grid-1"
+                      >Blog-1</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/blog-grid-2"
+                      >Blog-2</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/blog-grid-3"
+                      >Blog-3</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/blog-detail-1"
+                      >Blog Detail-1</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/blog-detail-2"
+                      >Blog Detail-2</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/feature"
+                      >Feature</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/feature-detail"
+                      >Feature Detail</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/team">Team</a>
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/faq">FAQ-1</a>
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/faq-2">FAQ-2</a>
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/contact"
+                      >Contact</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/error">Error</a>
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/career">Career</a>
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/pricing"
+                      >Pricing</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/privacy-policy"
+                      >Privacy Policy</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      class="bw_header_dropdown_item"
+                      href="/bank-special-offers"
+                      >Bank Special Offers</a
+                    >
+                  </li>
+                  <li>
+                    <a class="bw_header_dropdown_item" href="/login">Login</a>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+          <div class="bw_mobile_menu_icon">
+            <a href="javascript:;"
+              ><span class="material-symbols-outlined">menu</span></a
+            >
+          </div>
+          <a class="bw_custom_buttom" href="javascript:;">Open an account</a>
+        </div>
+      </div>
+    </header>
+    <!-- close_bw_header -->
+
+    <div class="bw_main_body">
+      <div data-scroll class="page">
+        <main>
+          <div class="bw_content">
+            <!-- start_bw_login_page_section -->
+            <section class="bw_login_page_section">
+              <div class="bw_container">
+                <div
+                  class="bw_login_page_wrap"
+                  data-aos="zoom-in"
+                  data-aos-duration="1000"
+                >
+                  <div class="bw_regisiter_wrap active">
+                    <h3 class="bw_sub_title">Create your account</h3>
+                    <p class="bw_dec_title">
+                      We denounce with righteous indignation and dislike men who
+                      are so beguiled
+                    </p>
+                    <form id="registerForm">
+                      <input
+                        class="bw_custom_input"
+                        type="text"
+                        name="firstName"
+                        placeholder="First Name"
+                        required
+                      />
+
+                      <input
+                        class="bw_custom_input"
+                        type="text"
+                        name="lastName"
+                        placeholder="Last Name"
+                        required
+                      />
+
+                      <input
+                        class="bw_custom_input"
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        required
+                      />
+
+                      <input
+                        class="bw_custom_input"
+                        type="tel"
+                        name="phone"
+                        placeholder="Phone"
+                        required
+                        pattern="[0-9]{11}"
+                        maxlength="11"
+                        title="Phone number must be exactly 11 digits"
+                      />
+
+                      <input
+                        class="bw_custom_input"
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        required
+                        minlength="8"
+                      />
+
+                      <input
+                        class="bw_custom_input"
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Confirm password"
+                        required
+                        minlength="8"
+                      />
+
+                      <button class="bw_custom_buttom" type="submit">
+                        Create Account
+                      </button>
+                      <p class="bw_pass_dec">
+                        The password should be at least eight characters long.
+                        To make it stronger, use upper and lower case letters,
+                        numbers, and symbols like ! " ? $ % ^ & )
+                      </p>
+                      <p>
+                        Already have an account ?
+                        <a href="/login" class="bw_login_click">Log In</a>
+                      </p>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <!-- close_bw_login_page_section -->
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- start_bw_footer -->
+    <footer class="bw_footer">
+      <div class="bw_container">
+        <div class="bw_footer_main_wrap">
+          <div class="bw_footer_col frist">
+            <div class="bw_footer_wrap">
+              <h5 class="bw_footer_title">Company</h5>
+              <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About us</a></li>
+                <li><a href="/contact">Contact</a></li>
+              </ul>
+            </div>
+            <div class="bw_footer_wrap">
+              <h5 class="bw_footer_title">Useful link</h5>
+              <ul>
+                <li><a href="/about">About us</a></li>
+                <li><a href="/feature">Feature</a></li>
+                <li><a href="/javascript:;">Pages</a></li>
+              </ul>
+            </div>
+            <div class="bw_footer_wrap">
+              <h5 class="bw_footer_title">Support</h5>
+              <ul>
+                <li><a href="javascript:;">support@urbanbank</a></li>
+                <li><a href="/faq">FAQ's</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="bw_footer_col second">
+            <div class="bw_mf_email_wrap">
+              <h4>Join our account</h4>
+              <div class="mf_email_box">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email address"
+                />
+                <a class="bw_custom_buttom" href="javascript:;"
+                  ><span>Subscribe</span></a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bw_copy_right_content">
+          <div class="bw_footer_logo_content">
+            <a href="/"
+              ><img src="/image/footer_logo.png" alt="FOoter_Logo"
+            /></a>
+          </div>
+          <p>@Urbanbank,All right reserved</p>
+        </div>
+      </div>
+    </footer>
+    <!-- close_bw_footer -->
+
+    <script src="/js/imagesloaded.pkgd.min.js"></script>
+    <script src="/js/scroll-parallax.js"></script>
+    <script src="/js/scroll-zoom.js"></script>
+    <script src="/js/custom.js"></script>
+    <script src="/js/register.js"></script>
+  </body>
+</html>

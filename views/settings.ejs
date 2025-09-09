@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title || "Settings" %> - Union Ledger</title>
+    <!-- Icons & Fonts -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+    />
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/settings.css" />
+  </head>
+  <body>
+    <%- include('partials/toast') %>
+
+    <main class="content">
+      <section class="card">
+        <header class="card__head">
+          <h2>Settings</h2>
+        </header>
+        <div>
+          <p>Customize your dashboard preferences:</p>
+          <form id="settingsForm" novalidate>
+            <label>
+              Theme:
+              <select id="themeSelect" name="theme">
+                <% if (user && user.settings && user.settings.theme === "light")
+                { %>
+                <option value="light" selected>Light</option>
+                <% } else { %>
+                <option value="light">Light</option>
+                <% } %> <% if (user && user.settings && user.settings.theme ===
+                "dark") { %>
+                <option value="dark" selected>Dark</option>
+                <% } else { %>
+                <option value="dark">Dark</option>
+                <% } %>
+              </select>
+            </label>
+
+            <label>
+              Language:
+              <select id="languageSelect" name="language">
+                <% if (user && user.settings && user.settings.language === "en")
+                { %>
+                <option value="en" selected>English</option>
+                <% } else { %>
+                <option value="en">English</option>
+                <% } %> <% if (user && user.settings && user.settings.language
+                === "fr") { %>
+                <option value="fr" selected>French</option>
+                <% } else { %>
+                <option value="fr">French</option>
+                <% } %> <% if (user && user.settings && user.settings.language
+                === "es") { %>
+                <option value="es" selected>Spanish</option>
+                <% } else { %>
+                <option value="es">Spanish</option>
+                <% } %>
+              </select>
+            </label>
+
+            <button type="submit" class="btn">Save Settings</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="/js/settings.js"></script>
+  </body>
+</html>

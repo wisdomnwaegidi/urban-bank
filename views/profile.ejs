@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Meta -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Profile</title>
+    <link rel="icon" href="/favicon/five-icon.png" type="image/gif" />
+    <link href="/css/profile.css" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Toast Partial -->
+    <%- include('partials/toast') %>
+
+    <div class="container profile-container">
+      <!-- Header -->
+      <div class="profile-header">
+        <h2 id="userNames" class="profile-name">
+          <% if (user) { %> <%= user.firstName %> <%= user.lastName %> <% } else { %> First Name Last Name <% } %>
+        </h2>
+        <p id="userAddress" class="profile-address">
+          <% if (user && user.address) { %> <%= user.address %> <% } else { %> Address not provided <% } %>
+        </p>
+      </div>
+
+      <!-- Profile Details Form -->
+      <form
+        action="/profile/<%= user ? user._id : '' %>/details"
+        id="uploadForm"
+        class="details-form"
+      >
+        <!-- Bio Section -->
+        <div class="form-section"><h3>Bio</h3></div>
+        <div class="form-group">
+          <label for="firstName">First name</label>
+          <input type="text" id="firstName" name="firstName" class="form-control" value="<%= user ? user.firstName : '' %>" required />
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last name</label>
+          <input type="text" id="lastName" name="lastName" class="form-control" value="<%= user ? user.lastName : '' %>" required />
+        </div>
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" name="dob" class="form-control" value="<%= user && user.dob ? user.dob.toISOString().split('T')[0] : '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="gender">Gender</label>
+          <select id="gender" name="gender" class="form-control">
+            <option value="">Select</option>
+            <option value="Male" <%= user && user.gender === 'Male' ? 'selected' : '' %>>Male</option>
+            <option value="Female" <%= user && user.gender === 'Female' ? 'selected' : '' %>>Female</option>
+            <option value="Other" <%= user && user.gender === 'Other' ? 'selected' : '' %>>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="religion">Religion</label>
+          <input type="text" id="religion" name="religion" class="form-control" value="<%= user ? user.religion : '' %>" />
+        </div>
+
+        <!-- Address Section -->
+        <div class="form-section"><h3>Address</h3></div>
+        <div class="form-group">
+          <label for="location">Location</label>
+          <input type="text" id="location" name="location" class="form-control" value="<%= user ? user.location : '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="state">State</label>
+          <input type="text" id="state" name="state" class="form-control" value="<%= user ? user.state : '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="city">City</label>
+          <input type="text" id="city" name="city" class="form-control" value="<%= user ? user.city : '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="country">Country</label>
+          <input type="text" id="country" name="country" class="form-control" value="<%= user ? user.country : '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="zipcode">Zipcode</label>
+          <input type="text" id="zipcode" name="zipcode" class="form-control" value="<%= user ? user.zipcode : '' %>" />
+        </div>
+
+        <!-- Next of Kin Section -->
+        <div class="form-section"><h3>Next of Kin</h3></div>
+        <div class="form-group">
+          <label for="nokFirstName">First name</label>
+          <input type="text" id="nokFirstName" name="nokFirstName" class="form-control" value="<%= user ? user.nokFirstName : '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="nokLastName">Last name</label>
+          <input type="text" id="nokLastName" name="nokLastName" class="form-control" value="<%= user ? user.nokLastName : '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="relationship">Relationship</label>
+          <input type="text" id="relationship" name="relationship" class="form-control" value="<%= user ? user.relationship : '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="nokAddress">Address</label>
+          <input type="text" id="nokAddress" name="nokAddress" class="form-control" value="<%= user ? user.nokAddress : '' %>" />
+        </div>
+
+        <!-- System Section -->
+        <div class="form-section"><h3>System</h3></div>
+        <div class="form-group">
+          <label for="currency">Currency</label>
+          <input type="text" id="currency" name="currency" class="form-control" value="<%= user ? user.currency : '' %>" />
+        </div>
+        <div class="form-group">
+          <label for="account">Account</label>
+          <input type="text" id="account" name="account" class="form-control" value="<%= user ? user.account : '' %>" />
+        </div>
+
+        <!-- Save Button full width -->
+        <button type="submit" class="btn-save">Save Details</button>
+      </form>
+    </div>
+
+    <script src="/js/profile.js"></script>
+  </body>
+</html>

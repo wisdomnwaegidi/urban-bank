@@ -1,0 +1,170 @@
+<link rel="stylesheet" href="/css/overview.css" />
+
+<!-- Not used to be used later -->
+<!-- <div class="market-ticker" id="marketTicker">
+  <span>Loading live data...</span>
+</div>
+
+<section class="card">
+  <h2>Our Rates</h2>
+  <div id="indices">
+    <p>Loading indices...</p>
+  </div>
+</section> -->
+<!-- Not used to be used later  -->
+
+<!-- Welcome -->
+<section class="welcome">
+  <h1>
+    Welcome <% if (user && user.firstName) { %> <%= user.firstName %> <% } else
+    { %> User <% } %>
+  </h1>
+  <marquee behavior="" direction="">
+    <div class="market-ticker">
+      <% tickers.forEach(t => { %>
+      <span><%= t.name %>: <%= t.value %></span>
+      <% }) %>
+    </div>
+  </marquee>
+</section>
+
+<!-- Receive Money + Balances + Rates -->
+<section class="grid three" aria-label="Balances and Rates">
+  <article class="card">
+    <h2>Receive Money</h2>
+    <p>
+      <strong>Account Name:</strong>
+      <% if (user && user.firstName && user.lastName) { %> <%= user.firstName +
+      " " + user.lastName %> <% } else { %> User <% } %>
+    </p>
+    <p>
+      <strong>Account Number:</strong>
+      <%= user && user.account ? user.account : "N/A" %>
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Your Balances:</h2>
+    <p>
+      <strong><%= user && user.currency ? user.currency : "Currency" %></strong>
+    </p>
+    <p>AVAILABLE BALANCE</p>
+    <div class="balance">
+      $<%= user && user.accountBalance ? user.accountBalance.toLocaleString() :
+      "0.00" %>
+    </div>
+  </article>
+
+  <article class="card">
+    <h2>Our Rates</h2>
+    <% indices.forEach(idx => { %>
+    <p><%= idx.label %>: <%= idx.value %></p>
+    <% }) %>
+  </article>
+</section>
+
+<!-- Trading Indices -->
+<section class="card" aria-label="Current Trading Indices">
+  <h2>Current Trading Indices</h2>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>EUR</th>
+          <th>USD</th>
+          <th>GBP</th>
+          <th>CAD</th>
+          <th>CNY</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (indices && indices.length > 0) { %> <% indices.forEach(row => {
+        %>
+        <tr>
+          <td><%= row.EUR %></td>
+          <td><%= row.USD %></td>
+          <td><%= row.GBP %></td>
+          <td><%= row.CAD %></td>
+          <td><%= row.CNY %></td>
+        </tr>
+        <% }) %> <% } else { %>
+        <tr>
+          <td colspan="5">No indices available</td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Recent Transactions -->
+<section class="card" aria-label="Recent Transactions">
+  <h2>Recent Transactions</h2>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Account</th>
+          <th>Amount</th>
+          <th>Type</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (transactions && transactions.length > 0) { %> <%
+        transactions.forEach(tx => { %>
+        <tr>
+          <td><%= user.account %></td>
+          <td>
+            <% if (tx.debit && tx.debit > 0) { %> -$<%=
+            tx.debit.toLocaleString() %> <% } else if (tx.credit && tx.credit >
+            0) { %> +$<%= tx.credit.toLocaleString() %> <% } else { %> $0.00 <%
+            } %>
+          </td>
+          <td>
+            <% if (tx.debit && tx.debit > 0) { %>
+            <span class="badge badge-danger">Debit</span>
+            <% } else if (tx.credit && tx.credit > 0) { %>
+            <span class="badge badge-success">Credit</span>
+            <% } else { %>
+            <span class="badge">N/A</span>
+            <% } %>
+          </td>
+          <td><%= new Date(tx.date).toLocaleString() %></td>
+        </tr>
+        <% }) %> <% } else { %>
+        <tr>
+          <td colspan="4">No recent transactions</td>
+        </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<script>
+  async function fetchMarketData() {
+    try {
+      const res = await fetch("/api/market");
+      const data = await res.json();
+
+      // Update ticker
+      const tickerDiv = document.getElementById("marketTicker");
+      tickerDiv.innerHTML = data.tickers
+        .map((t) => `<span>${t.name}: ${t.value || "--"}</span>`)
+        .join("");
+
+      // Update indices
+      const indicesDiv = document.getElementById("indices");
+      indicesDiv.innerHTML = data.indices
+        .map((i) => `<p>${i.label}: ${i.value || "--"}</p>`)
+        .join("");
+    } catch (err) {
+      console.error("Error fetching market data", err);
+    }
+  }
+
+  // Fetch immediately and refresh every 60 seconds
+  fetchMarketData();
+  setInterval(fetchMarketData, 60000);
+</script>

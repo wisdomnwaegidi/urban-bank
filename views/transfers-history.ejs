@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/transfer-history.css" />
+    <title>History</title>
+  </head>
+  <body>
+    <section class="transfer-section transfer-history">
+      <h2 class="transfer-title">Transfer History</h2>
+
+      <div class="table-wrap">
+        <% if (transactions && transactions.length > 0) { %>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% transactions.forEach(tx => { %>
+            <tr>
+              <td><%= tx.date %></td>
+              <td><%= tx.type %></td>
+              <td>
+                <% if (tx.debit && tx.debit > 0) { %> -$<%=
+                tx.debit.toLocaleString() %> <% } else if (tx.credit &&
+                tx.credit > 0) { %> +$<%= tx.credit.toLocaleString() %> <% }
+                else { %> $0 <% } %>
+              </td>
+              <td>
+                <% if (tx.status === "Completed") { %>
+                <span class="status completed"><%= tx.status %></span>
+                <% } else if (tx.status === "Pending") { %>
+                <span class="status pending"><%= tx.status %></span>
+                <% } else { %>
+                <span class="status failed"><%= tx.status %></span>
+                <% } %>
+              </td>
+              <td><%= tx.description || "-" %></td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% } else { %>
+        <p class="no-data">No transactions found.</p>
+        <% } %>
+      </div>
+    </section>
+  </body>
+</html>

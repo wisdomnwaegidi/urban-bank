@@ -1,0 +1,48 @@
+<link rel="stylesheet" href="/css/style.css" />
+
+<div id="toast" class="toast hidden">
+  <div class="toast-content">
+    <span id="toastMessage"></span>
+  </div>
+</div>
+
+<script src="/js/toast.js"></script>
+<style>
+  @import url("style.css");
+
+  /* Toast base */
+  .toast {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 999;
+    padding: 16px;
+    border-radius: 6px;
+    max-width: 400px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    display: none;
+    font-family: var(--font_family_1);
+    max-height: 60px;
+  }
+
+  .toast-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Toast types */
+  .toast-success {
+    background-color: #28a745; /* green */
+  }
+
+  .toast-error {
+    background-color: #dc3545; /* red */
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>

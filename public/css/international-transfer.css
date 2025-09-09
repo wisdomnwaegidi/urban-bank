@@ -1,0 +1,69 @@
+.international-transfer {
+  background: var(--bg_othe_1);
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  color: var(--text_white);
+  margin-bottom: 2rem;
+}
+
+.international-transfer .transfer-title {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  background: var(--text_gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.transfer-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.transfer-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text_white);
+}
+
+.transfer-form input,
+.transfer-form textarea {
+  width: 60%;
+  padding: 0.75rem;
+  border: 2px solid var(--border_color);
+  border-radius: 6px;
+  background: var(--bg_input_color);
+  color: var(--text_white);
+  font-size: 1rem;
+}
+
+.transfer-form input:focus,
+.transfer-form textarea:focus {
+  outline: none;
+  border-color: var(--text_menu_hover);
+}
+
+.transfer-form textarea {
+  resize: vertical;
+}
+
+.form-actions {
+  margin-top: 2rem;
+}
+
+.btn-transfer {
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-transform: uppercase;
+  background: var(--bg_gradient);
+  color: var(--text_black);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-transfer:hover {
+  background: var(--bg_gradient_hover);
+  transform: translateY(-2px);
+}

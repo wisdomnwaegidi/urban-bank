@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>
+      <%= typeof title !== 'undefined' ? title + ' - ' : '' %>Banking Dashboard
+    </title>
+    <link rel="icon" href="/favicon/five-icon.png" type="image/gif" />
+
+    <!-- Icons + Fonts -->
+    <link href="/css/font-awesome.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700&family=Urbanist:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/dashboard.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="Primary">
+      <div class="brand">
+        <a href="/" class="brand__link" aria-label="Homepage">
+          <span class="brand__name">Union Ledger</span>
+        </a>
+      </div>
+
+      <nav class="side-nav">
+        <ul>
+          <li>
+            <a
+              class="nav-link <%= typeof active !== 'undefined' && active === 'overview' ? 'active' : '' %>"
+              href="/overview"
+              id="overview"
+              ><i class="fa fa-home"></i><span>Overview</span></a
+            >
+          </li>
+          <li class="has-submenu">
+            <a
+              class="nav-link <%= typeof active !== 'undefined' && active === 'accounts' ? 'active' : '' %>"
+              href="#"
+              id="accounts"
+            >
+              <i class="fa fa-money"></i><span>Accounts</span>
+              <i class="fa fa-angle-down submenu-arrow"></i>
+            </a>
+            <ul class="submenu">
+              <li>
+                <a href="/profile" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> Profile
+                </a>
+              </li>
+              <li>
+                <a href="/accounts/kyc" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> KYC
+                </a>
+              </li>
+              <li>
+                <a href="/accounts/statement" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> Statement
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a
+              class="nav-link <%= typeof active !== 'undefined' && active === 'cards' ? 'active' : '' %>"
+              href="/cards"
+              id="cards"
+              ><i class="fa fa-credit-card"></i><span>Cards</span></a
+            >
+          </li>
+          <li class="has-submenu">
+            <a
+              class="nav-link <%= typeof active !== 'undefined' && active === 'transfers' ? 'active' : '' %>"
+              href="#"
+              id="transfers"
+            >
+              <i class="fa fa-exchange"></i><span>Transfers</span>
+              <i class="fa fa-angle-down submenu-arrow"></i>
+            </a>
+            <ul class="submenu">
+              <li>
+                <a href="/transfers/local" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> Local
+                </a>
+              </li>
+              <li>
+                <a href="/transfers/international" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> International
+                </a>
+              </li>
+              <li>
+                <a href="/transfers/mobile-deposit" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> Mobile Deposit
+                </a>
+              </li>
+              <li>
+                <a href="/transfers/history" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> History
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li class="has-submenu">
+            <a
+              class="nav-link <%= typeof active !== 'undefined' && active === 'loan' ? 'active' : '' %>"
+              href="#"
+              id="loan"
+            >
+              <i class="fa fa-file-text-o"></i><span>Loan</span>
+              <i class="fa fa-angle-down submenu-arrow"></i>
+            </a>
+            <ul class="submenu">
+              <li>
+                <a href="/loan/application" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> Application
+                </a>
+              </li>
+              <li>
+                <a href="/loan/status" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> Status
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a
+              class="nav-link <%= typeof active !== 'undefined' && active === 'analytics' ? 'active' : '' %>"
+              href="/analytics"
+              id="analytics"
+              ><i class="fa fa-line-chart"></i><span>Analytics</span></a
+            >
+          </li>
+          <li class="has-submenu">
+            <a
+              class="nav-link <%= typeof active !== 'undefined' && active === 'security' ? 'active' : '' %>"
+              href="#"
+              id="security"
+            >
+              <i class="fa fa-shield"></i><span>Security</span>
+              <i class="fa fa-angle-down submenu-arrow"></i>
+            </a>
+            <ul class="submenu">
+              <li>
+                <a href="/security/password" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> Password
+                </a>
+              </li>
+              <li>
+                <a href="/security/pin" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> PIN
+                </a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a
+              class="nav-link <%= typeof active !== 'undefined' && active === 'settings' ? 'active' : '' %>"
+              href="/settings"
+              id="settings"
+              ><i class="fa fa-cog"></i><span>Settings</span></a
+            >
+          </li>
+        </ul>
+
+        <div class="side-foot">
+          <button class="btn btn-outline" id="openSupport">
+            <i class="fa fa-life-ring"></i> Support
+          </button>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- App container -->
+    <div class="app">
+      <!-- Topbar -->
+      <header class="topbar" aria-label="Secondary">
+        <button class="icon-btn" id="menuToggle" aria-label="Toggle menu">
+          <i class="fa fa-bars"></i>
+        </button>
+
+        <form class="search" role="search" aria-label="Search transactions">
+          <input
+            type="search"
+            placeholder="Search transactions, payees, categories…"
+            aria-label="Search"
+            id="globalSearch"
+          />
+          <button class="icon-btn" type="submit" aria-label="Search">
+            <i class="fa fa-search"></i>
+          </button>
+        </form>
+
+        <div class="topbar__right">
+          <button class="icon-btn" aria-label="Notifications" id="notifyBtn">
+            <i class="fa fa-bell-o"></i
+            ><span class="dot" aria-hidden="true"></span>
+          </button>
+          <div class="profile">
+            <button
+              class="profile__btn"
+              id="profileBtn"
+              aria-expanded="false"
+              aria-haspopup="menu"
+            >
+              <% if (user && user.profilePicture) { %>
+              <img
+                src="/image/<%= user.profilePicture %>"
+                alt="Profile"
+                class="avatar"
+                style="
+                  width: 32px;
+                  height: 32px;
+                  border-radius: 50%;
+                  object-fit: cover;
+                "
+              />
+              <% } else { %>
+              <span class="avatar" aria-hidden="true"></span>
+              <% } %>
+              <span class="profile__name" id="userName"
+                ><% if (user && user.firstName) { %><%= user.firstName %><% }
+                else { %>User<% } %></span
+              >
+              <i class="fa fa-angle-down" aria-hidden="true"></i>
+            </button>
+            <ul
+              class="profile__menu"
+              role="menu"
+              aria-label="Profile menu"
+              id="profileMenu"
+            >
+              <li role="menuitem"><a href="/profile">Edit Profile</a></li>
+              <li role="menuitem"><a href="/settings">Settings</a></li>
+              <li role="menuitem"><a href="/logout" id="logout">Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main -->
+      <main class="content" id="content">
+        <!-- Page content will be inserted here -->
+        <%- body %>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>© <span id="year"></span> Union Ledger Bank. All rights reserved.</p>
+      </footer>
+    </div>
+
+    <!-- Toasts -->
+    <div
+      class="toast"
+      id="toast"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+
+    <!-- Support Modal -->
+    <div class="modal" id="supportModal" aria-hidden="true">
+      <div class="modal__overlay" id="modalOverlay"></div>
+      <div
+        class="modal__content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="supportTitle"
+      >
+        <button class="modal__close" id="closeModal" aria-label="Close">
+          &times;
+        </button>
+        <h2 id="supportTitle" class="support__title">Support Request</h2>
+        <form id="supportForm">
+          <label for="issue">Describe your issue:</label>
+          <textarea id="issue" name="issue" rows="5" required></textarea>
+
+          <label for="email">Your email:</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="you@example.com"
+            required
+          />
+
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/userAction.js"></script>
+  </body>
+</html>

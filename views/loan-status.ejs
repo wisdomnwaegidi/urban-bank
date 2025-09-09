@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/loan-stus.css" />
+    <title>Loan Status</title>
+  </head>
+  <body>
+    <div class="card loan-status-card">
+      <div class="card__head">
+        <h2>Loan Status</h2>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table loan-status-table">
+          <thead>
+            <tr>
+              <th>Loan ID</th>
+              <th>Amount</th>
+              <th>Term</th>
+              <th>Status</th>
+              <th>Application Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (loans && loans.length > 0) { %> <% loans.forEach(loan => { %>
+            <tr>
+              <td><%= loan.id %></td>
+              <td>$<%= loan.amount.toLocaleString() %></td>
+              <td><%= loan.term %></td>
+              <td>
+                <% if (loan.status === "Approved") { %>
+                <span class="status approved"><%= loan.status %></span>
+                <% } else if (loan.status === "Pending") { %>
+                <span class="status pending"><%= loan.status %></span>
+                <% } else { %>
+                <span class="status rejected"><%= loan.status %></span>
+                <% } %>
+              </td>
+              <td><%= loan.date %></td>
+            </tr>
+            <% }) %> <% } else { %>
+            <tr>
+              <td colspan="5" class="no-data">No loan applications found.</td>
+            </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+.loan-form {
+  width: 60vw; /* Inputs take 60% of viewport */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.loan-form label {
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.loan-form input,
+.loan-form textarea,
+.loan-form select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border_color_2);
+  border-radius: 6px;
+  background: var(--bg_input_color);
+  color: var(--text_white);
+  font-size: 1rem;
+}
+
+.loan-form input:focus,
+.loan-form textarea:focus,
+.loan-form select:focus {
+  outline: none;
+  border-color: var(--bg_gradient_hover);
+}
+
+.loan-form textarea {
+  resize: vertical;
+}
+
+.loan-form .btn-primary {
+  margin-top: 1rem;
+  align-self: flex-start; /* Button stays on its own */
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  background: var(--bg_gradient);
+  color: var(--text_black);
+  transition: background 0.3s ease;
+}
+
+.loan-form .btn-primary:hover {
+  background: var(--bg_gradient_hover);
+}

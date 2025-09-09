@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/loan.css">
+    <title>Loan Application</title>
+  </head>
+  <body>
+    <div class="card">
+      <div class="card__head">
+        <h2>Loan Application</h2>
+      </div>
+
+      <form method="POST" action="/loan/application" class="loan-form">
+        <!-- Loan Amount -->
+        <label for="loanAmount">Loan Amount</label>
+        <input
+          type="number"
+          id="loanAmount"
+          name="loanAmount"
+          placeholder="Enter loan amount"
+          required
+        />
+
+        <!-- Loan Purpose -->
+        <label for="purpose">Purpose</label>
+        <textarea
+          id="purpose"
+          name="purpose"
+          placeholder="Enter purpose of the loan"
+          rows="3"
+          required
+        ></textarea>
+
+        <!-- Repayment Term -->
+        <label for="term">Repayment Term</label>
+        <select id="term" name="term" required>
+          <option value="">Select term</option>
+          <option value="6">6 Months</option>
+          <option value="12">12 Months</option>
+          <option value="24">24 Months</option>
+        </select>
+
+        <!-- Interest Rate (auto-calculated or fixed for now) -->
+        <label for="interest">Interest Rate</label>
+        <input
+          type="text"
+          id="interest"
+          name="interest"
+          value="5% per annum"
+          readonly
+        />
+
+        <!-- Collateral -->
+        <label for="collateral">Collateral (if any)</label>
+        <input
+          type="text"
+          id="collateral"
+          name="collateral"
+          placeholder="Enter collateral details"
+        />
+
+        <!-- Application Date -->
+        <label for="applicationDate">Application Date</label>
+        <input
+          type="text"
+          id="applicationDate"
+          name="applicationDate"
+          value="<%= new Date().toLocaleDateString() %>"
+          readonly
+        />
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-primary">
+          Submit Application
+        </button>
+      </form>
+    </div>
+  </body>
+</html>

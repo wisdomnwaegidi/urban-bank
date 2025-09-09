@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Account Report</title>
+    <link rel="stylesheet" href="/css/account-statement.css" />
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header -->
+      <div class="page-header">
+        <h1 class="page-title">Account Report</h1>
+        <p class="account-info">
+          Statement for <%= user.firstName %> <%= user.lastName %> 
+          (<%= user.email %>)
+        </p>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="summary-cards">
+        <div class="summary-card credits">
+          <div class="card-title">Total Credits</div>
+          <div class="card-value positive">
+            $<%= totalCredits.toLocaleString() %>
+          </div>
+        </div>
+        <div class="summary-card debits">
+          <div class="card-title">Total Debits</div>
+          <div class="card-value negative">
+            $<%= totalDebits.toLocaleString() %>
+          </div>
+        </div>
+        <div class="summary-card balance">
+          <div class="card-title">Net Balance</div>
+          <div class="card-value neutral">
+            $<%= balance.toLocaleString() %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Date Filter -->
+      <div class="statement-filters">
+        <form method="GET" action="/accounts/report" class="filter-form">
+          <div class="form-group">
+            <label for="fromDate">From Date</label>
+            <input 
+              type="date" 
+              id="fromDate" 
+              name="fromDate" 
+              value="<%= fromDate || '' %>" 
+              required 
+            />
+          </div>
+          <div class="form-group">
+            <label for="toDate">To Date</label>
+            <input 
+              type="date" 
+              id="toDate" 
+              name="toDate" 
+              value="<%= toDate || '' %>" 
+              required 
+            />
+          </div>
+          <button type="submit" class="btn-primary">Generate Report</button>
+        </form>
+      </div>
+
+      <!-- Monthly Summary -->
+      <div class="statement-section monthly-summary">
+        <div class="section-header">
+          <h2 class="section-title">Monthly Account Summary</h2>
+        </div>
+
+        <% Object.keys(monthlySummary).forEach(monthKey => { 
+            const year = monthKey.split("-")[0];
+            const month = monthKey.split("-")[1];
+            const m = monthlySummary[monthKey];
+            const net = m.credits - m.debits;
+        %>
+          <div class="monthly-row">
+            <div class="month-info"><%= year %> - <%= month %></div>
+            <div class="amounts">
+              <div class="amount-item">
+                <div class="amount-label">Credits</div>
+                <div class="amount-value credit">
+                  $<%= m.credits.toLocaleString() %>
+                </div>
+              </div>
+              <div class="amount-item">
+                <div class="amount-label">Debits</div>
+                <div class="amount-value debit">
+                  $<%= m.debits.toLocaleString() %>
+                </div>
+              </div>
+              <div class="amount-item">
+                <div class="amount-label">Net</div>
+                <div class="amount-value <%= net >= 0 ? 'balance' : 'negative' %>">
+                  $<%= net.toLocaleString() %>
+                </div>
+              </div>
+              <a href="/accounts/statement/<%= year %>/<%= parseInt(month) %>" class="view-btn">
+                View
+              </a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="statement-section">
+        <div class="section-header">
+          <h2 class="section-title">Recent Transactions</h2>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Debit</th>
+                <th>Credit</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (transactions && transactions.length > 0) { %>
+                <% transactions.forEach(tx => { %>
+                  <tr>
+                    <td><%= tx.date.toISOString().slice(0,10) %></td>
+                    <td><%= tx.description %></td>
+                    <td><%= tx.debit ? "$" + tx.debit.toLocaleString() : "-" %></td>
+                    <td><%= tx.credit ? "$" + tx.credit.toLocaleString() : "-" %></td>
+                    <td>$<%= tx.balance.toLocaleString() %></td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="5">No transactions found</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

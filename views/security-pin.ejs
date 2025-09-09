@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PIN Settings</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/security-pin.css" />
+  </head>
+  <body>
+    <div class="security-container">
+      <h2><i class="fa fa-key"></i> Update PIN</h2>
+
+      <form action="/security/pin" method="POST" class="security-form">
+        <div class="form-group">
+          <label for="currentPin">Current PIN</label>
+          <div class="input-with-icon">
+            <input
+              type="password"
+              id="currentPin"
+              name="currentPin"
+              maxlength="6"
+              required
+            />
+            <i class="fa fa-eye toggle-password" data-target="currentPin"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="newPin">New PIN</label>
+          <div class="input-with-icon">
+            <input
+              type="password"
+              id="newPin"
+              name="newPin"
+              maxlength="6"
+              required
+            />
+            <i class="fa fa-eye toggle-password" data-target="newPin"></i>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPin">Confirm PIN</label>
+          <div class="input-with-icon">
+            <input
+              type="password"
+              id="confirmPin"
+              name="confirmPin"
+              maxlength="6"
+              required
+            />
+            <i class="fa fa-eye toggle-password" data-target="confirmPin"></i>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save PIN</button>
+      </form>
+    </div>
+
+    <script src="/js/security.js"></script>
+  </body>
+</html>

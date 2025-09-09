@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/mobile-deposit.css" />
+    <title>Mobile Deposit</title>
+  </head>
+  <body>
+    <section class="transfer-section mobile-deposit">
+      <h2 class="transfer-title">Mobile Deposit</h2>
+      <form
+        method="POST"
+        action="/transfers/mobile-deposit"
+        class="transfer-form"
+      >
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number</label>
+          <input
+            type="text"
+            id="phoneNumber"
+            name="phoneNumber"
+            placeholder="Phone Number"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="amount">Amount</label>
+          <input
+            type="number"
+            id="amount"
+            name="amount"
+            placeholder="Amount"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            name="description"
+            placeholder="Description"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-transfer">Deposit</button>
+        </div>
+      </form>
+    </section>
+  </body>
+</html>

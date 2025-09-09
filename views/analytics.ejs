@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/analytics.css" />
+    <title>Analytics</title>
+  </head>
+  <body>
+    <main class="analytics-page">
+      <h1 class="page-title">Analytics Dashboard</h1>
+      <section class="stats-cards">
+        <div class="card">
+          <h3>Total Balance</h3>
+          <p>$40,000</p>
+        </div>
+        <div class="card">
+          <h3>Monthly Spending</h3>
+          <p>$5,200</p>
+        </div>
+        <div class="card">
+          <h3>Income</h3>
+          <p>$6,800</p>
+        </div>
+      </section>
+
+      <section class="charts">
+        <div class="chart-container">
+          <canvas id="spendingChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <canvas id="incomeChart"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      // Spending Chart
+      const ctx1 = document.getElementById("spendingChart").getContext("2d");
+      new Chart(ctx1, {
+        type: "line",
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          datasets: [
+            {
+              label: "Spending",
+              data: [1200, 900, 1500, 1100, 1800, 1400],
+              borderColor: "red",
+              backgroundColor: "rgba(255, 0, 0, 0.2)",
+              fill: true,
+            },
+          ],
+        },
+      });
+
+      // Income Chart
+      const ctx2 = document.getElementById("incomeChart").getContext("2d");
+      new Chart(ctx2, {
+        type: "bar",
+        data: {
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          datasets: [
+            {
+              label: "Income",
+              data: [2000, 2500, 2300, 2800, 3000, 2600],
+              backgroundColor: "blue",
+            },
+          ],
+        },
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Banking Dashboard</title>
+    <link rel="icon" href="/favicon/five-icon.png" type="image/gif" />
+
+    <!-- Icons + Fonts -->
+    <link href="/css/font-awesome.min.css" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700&family=Urbanist:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/css/dashboard.css" />
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="Primary">
+      <div class="brand">
+        <a href="/" class="brand__link" aria-label="Homepage">
+          <span class="brand__name">Union Ledger</span>
+        </a>
+      </div>
+
+      <nav class="side-nav">
+        <ul>
+          <li>
+            <a class="nav-link active" href="/overview" id="overview"
+              ><i class="fa fa-home"></i><span>Overview</span></a
+            >
+          </li>
+          <li>
+            <a class="nav-link" href="/accounts" id="accounts">
+              <i class="fa fa-money"></i><span>Accounts</span>
+            </a>
+          </li>
+          <li>
+            <a class="nav-link" href="/cards" id="cards"
+              ><i class="fa fa-credit-card"></i><span>Cards</span></a
+            >
+          </li>
+          <li>
+            <a class="nav-link" href="transfers" id="transfers"
+              ><i class="fa fa-exchange"></i><span>Transfers</span></a
+            >
+          </li>
+          <li>
+            <a class="nav-link" href="/bills" id="bills"
+              ><i class="fa fa-file-text-o"></i><span>Bills</span></a
+            >
+          </li>
+          <li>
+            <a class="nav-link" href="/analytics" id="analytics"
+              ><i class="fa fa-line-chart"></i><span>Analytics</span></a
+            >
+          </li>
+          <li>
+            <a class="nav-link" href="/security" id="security"
+              ><i class="fa fa-shield"></i><span>Security</span></a
+            >
+          </li>
+          <li>
+            <a class="nav-link" href="/settings" id="settings"
+              ><i class="fa fa-cog"></i><span>Settings</span></a
+            >
+          </li>
+        </ul>
+
+        <div class="side-foot">
+          <button class="btn btn-outline" id="openSupport">
+            <i class="fa fa-life-ring"></i> Support
+          </button>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- App container -->
+    <div class="app">
+      <!-- Topbar -->
+      <header class="topbar" aria-label="Secondary">
+        <button class="icon-btn" id="menuToggle" aria-label="Toggle menu">
+          <i class="fa fa-bars"></i>
+        </button>
+
+        <form class="search" role="search" aria-label="Search transactions">
+          <input
+            type="search"
+            placeholder="Search transactions, payees, categories…"
+            aria-label="Search"
+            id="globalSearch"
+          />
+          <button class="icon-btn" type="submit" aria-label="Search">
+            <i class="fa fa-search"></i>
+          </button>
+        </form>
+
+        <div class="topbar__right">
+          <button class="icon-btn" aria-label="Notifications" id="notifyBtn">
+            <i class="fa fa-bell-o"></i
+            ><span class="dot" aria-hidden="true"></span>
+          </button>
+          <div class="profile">
+            <button
+              class="profile__btn"
+              id="profileBtn"
+              aria-expanded="false"
+              aria-haspopup="menu"
+            >
+              <span class="avatar" aria-hidden="true"></span>
+              <span class="profile__name" id="userName"
+                ><% if (user && user.firstName) { %><%= user.firstName %><% }
+                else { %>User<% } %></span
+              >
+              <i class="fa fa-angle-down" aria-hidden="true"></i>
+            </button>
+            <ul
+              class="profile__menu"
+              role="menu"
+              aria-label="Profile menu"
+              id="profileMenu"
+            >
+              <li role="menuitem"><a href="/profile">Edit Profile</a></li>
+              <li role="menuitem"><a href="/settings">Settings</a></li>
+              <li role="menuitem"><a href="/logout" id="logout">Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main -->
+      <main class="content" id="content">
+        <!-- Welcome -->
+        <section class="welcome">
+          <h1>
+            Welcome <% if (user && user.firstName) { %><%= user.firstName %><% }
+            else { %>User<% } %>
+          </h1>
+          <div class="market-ticker">
+            <!-- Replace this with your ticker feed -->
+            <span>EUR to USD 1.16486 +0.00 (+0.01%)</span>
+            <span>Bitcoin 110,859 -900.00 (-0.81%)</span>
+            <span>Ethereum 4,326.9 -125.90 (-2.83%)</span>
+            <span>GBP to USD 1.3038 -0.00 (-0.02%)</span>
+            <span>US 100 23,664.8 -23.10 (-0.10%)</span>
+          </div>
+        </section>
+
+        <!-- Receive Money + Balances + Rates -->
+        <section class="grid three" aria-label="Balances and Rates">
+          <article class="card">
+            <h2>Receive Money</h2>
+            <p>
+              <strong>Account Name:</strong>
+              <% if (user && user.firstName && user.lastName) { %> <%=
+              user.firstName + " " + user.lastName %> <% } else { %> User <% }
+              %>
+            </p>
+            <p><strong>Account Number:</strong> 1043112016</p>
+          </article>
+
+          <article class="card">
+            <h2>Your Balances:</h2>
+            <p><strong>US Dollar</strong></p>
+            <p>AVAILABLE BALANCE</p>
+            <div class="balance">$666,000.00</div>
+            <p><small>Default</small></p>
+          </article>
+
+          <article class="card">
+            <h2>Our Rates</h2>
+            <p>No Rate Available</p>
+          </article>
+        </section>
+
+        <!-- Trading Indices -->
+        <section class="card" aria-label="Current Trading Indices">
+          <h2>Current Trading Indices</h2>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>EUR</th>
+                  <th>USD</th>
+                  <th>GBP</th>
+                  <th>CAD</th>
+                  <th>CNY</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>-0.01%</td>
+                  <td>0.01%</td>
+                  <td>0.01%</td>
+                  <td>0.01%</td>
+                  <td>0%</td>
+                </tr>
+                <tr>
+                  <td>0.01%</td>
+                  <td>0.01%</td>
+                  <td>-0.01%</td>
+                  <td>-0.01%</td>
+                  <td>-0.01%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Recent Transactions -->
+        <section class="card" aria-label="Recent Transactions">
+          <h2>Recent Transactions</h2>
+          <div class="table-wrap">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th>Amount</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1043112016</td>
+                  <td>-210,000.00</td>
+                  <td><span class="badge badge-danger">Debit</span></td>
+                  <td>2024-07-02 13:42:11</td>
+                </tr>
+                <tr>
+                  <td>1043112016</td>
+                  <td>-210,000.00</td>
+                  <td><span class="badge badge-danger">Debit</span></td>
+                  <td>2024-07-02 13:39:18</td>
+                </tr>
+                <tr>
+                  <td>1043112016</td>
+                  <td>-175,000.00</td>
+                  <td><span class="badge badge-danger">Debit</span></td>
+                  <td>2024-07-02 13:39:15</td>
+                </tr>
+                <tr>
+                  <td>1043112016</td>
+                  <td>345,000.00</td>
+                  <td><span class="badge badge-success">Credit</span></td>
+                  <td>2024-07-02 13:36:42</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <p>© <span id="year"></span> Union Ledger Bank. All rights reserved.</p>
+      </footer>
+    </div>
+
+    <!-- Toasts -->
+    <div
+      class="toast"
+      id="toast"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+
+    <!-- Scripts -->
+    <script src="/js/userAction.js"></script>
+  </body>
+</html>
