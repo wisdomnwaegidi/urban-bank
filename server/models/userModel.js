@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,6 +20,13 @@ const userSchema = new mongoose.Schema(
       match: [/^\d+$/, "Phone number must contain only digits"],
     },
     password: { type: String, required: true },
+
+    // 🔐 PIN (hashed)
+    pin: {
+      type: String,
+      minlength: 4,
+      maxlength: 1024, // hash length
+    },
 
     // Profile Info
     dob: { type: Date },
@@ -79,26 +87,81 @@ const userSchema = new mongoose.Schema(
     // Transactions history
     transactions: [
       {
-        date: { type: Date, default: Date.now },
-        description: String,
-        debit: { type: Number, default: 0 },
-        credit: { type: Number, default: 0 },
-        balance: Number,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Transaction",
       },
     ],
-    transactionsHistory: {
-      date: { type: Date, default: Date.now },
-      type: { type: String, enum: ["Credit", "Debit"], required: true },
-      amount: { type: Number, required: true },
-      status: {
-        type: String,
-        enum: ["Completed", "Pending", "Failed"],
-        default: "Completed",
+
+    transactionsHistory: [
+      {
+        date: { type: Date, default: Date.now },
+        type: { type: String, enum: ["Credit", "Debit"], required: true },
+        amount: { type: Number, required: true },
+        status: {
+          type: String,
+          enum: ["Completed", "Pending", "Failed"],
+          default: "Completed",
+        },
+        description: { type: String, trim: true },
       },
-      description: { type: String, trim: true },
+    ],
+
+    // User Settings
+    settings: {
+      theme: {
+        type: String,
+        enum: ["light", "dark"],
+        default: "light",
+      },
+      language: {
+        type: String,
+        enum: ["en", "fr", "es"],
+        default: "en",
+      },
     },
+
+    // Loan Applications
+    loanApplications: [
+      {
+        loanAmount: { type: Number, required: true },
+        purpose: { type: String, required: true, trim: true },
+        term: { type: Number, required: true }, // months
+        interest: { type: String, default: "5% per annum" },
+        collateral: { type: String, trim: true },
+        applicationDate: { type: Date, default: Date.now },
+        status: {
+          type: String,
+          enum: ["Pending", "Approved", "Rejected"],
+          default: "Pending",
+        },
+      },
+    ],
   },
   { timestamps: true }
 );
+
+// 🔒 Pre-save hook for password and pin
+userSchema.pre("save", async function (next) {
+  try {
+    // Hash password if modified
+    if (this.isModified("password")) {
+      this.password = await bcrypt.hash(this.password, 10);
+    }
+
+    // Hash pin if modified
+    if (this.isModified("pin") && this.pin) {
+      this.pin = await bcrypt.hash(this.pin, 10);
+    }
+
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Method to compare PIN
+userSchema.methods.comparePin = async function (enteredPin) {
+  return await bcrypt.compare(enteredPin, this.pin);
+};
 
 module.exports = mongoose.model("Userdb", userSchema);

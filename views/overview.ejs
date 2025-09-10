@@ -1,18 +1,5 @@
 <link rel="stylesheet" href="/css/overview.css" />
 
-<!-- Not used to be used later -->
-<!-- <div class="market-ticker" id="marketTicker">
-  <span>Loading live data...</span>
-</div>
-
-<section class="card">
-  <h2>Our Rates</h2>
-  <div id="indices">
-    <p>Loading indices...</p>
-  </div>
-</section> -->
-<!-- Not used to be used later  -->
-
 <!-- Welcome -->
 <section class="welcome">
   <h1>
@@ -78,7 +65,7 @@
         </tr>
       </thead>
       <tbody>
-        <% if (indices && indices.length > 0) { %> <% indices.forEach(row => {
+        <% if (currentIndices && currentIndices.length > 0) { %> <% currentIndices.forEach(row => {
         %>
         <tr>
           <td><%= row.EUR %></td>
@@ -142,29 +129,4 @@
   </div>
 </section>
 
-<script>
-  async function fetchMarketData() {
-    try {
-      const res = await fetch("/api/market");
-      const data = await res.json();
 
-      // Update ticker
-      const tickerDiv = document.getElementById("marketTicker");
-      tickerDiv.innerHTML = data.tickers
-        .map((t) => `<span>${t.name}: ${t.value || "--"}</span>`)
-        .join("");
-
-      // Update indices
-      const indicesDiv = document.getElementById("indices");
-      indicesDiv.innerHTML = data.indices
-        .map((i) => `<p>${i.label}: ${i.value || "--"}</p>`)
-        .join("");
-    } catch (err) {
-      console.error("Error fetching market data", err);
-    }
-  }
-
-  // Fetch immediately and refresh every 60 seconds
-  fetchMarketData();
-  setInterval(fetchMarketData, 60000);
-</script>

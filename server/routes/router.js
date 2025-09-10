@@ -22,6 +22,15 @@ const {
   getReport,
   getTransferHistory,
   getOverview,
+  internationalTransfer,
+  applyForLoan,
+  getLoanStatus,
+  mobileDeposit,
+  updatePassword,
+  updatePin,
+  updateSettings,
+  exportStatementPDF,
+  exportStatementExcel,
 } = require("../controller/userController");
 const upload = require("../middleware/multer");
 const router = express.Router();
@@ -121,6 +130,8 @@ router.get("/reset-password", async (req, res) =>
 
 router.post("/reset-password", resetPassword);
 
+router.post("/security/password", verifyToken, updatePassword);
+
 router.post("/contact-us", contactUs);
 
 /* ===========================
@@ -132,18 +143,8 @@ router.get("/dashboard", verifyToken, (req, res) => {
   res.redirect("/overview");
 });
 
-// Overview page (main dashboard content)
-/* router.get("/overview", verifyToken, (req, res) => {
-  res.render("overview", {
-    layout: "layout", // Use custom dashboard layout
-    title: "Overview",
-    user: req.user,
-    loggedIn: true,
-    active: "overview",
-  });
-}); */
-
 router.get("/overview", verifyToken, getOverview);
+
 // Accounts - KYC
 router.get("/accounts/kyc", verifyToken, async (req, res) => {
   res.render("accounts-kyc", {
@@ -158,17 +159,20 @@ router.get("/accounts/kyc", verifyToken, async (req, res) => {
 // POST /accounts/kyc
 router.post("/accounts/kyc", verifyToken, submitKyc);
 
-// Local Transfer
-router.post("/transfers/local", verifyToken, localTransfer);
-
 // Accounts - Statement Data API
 router.get("/accounts/statement", verifyToken, getStatement);
 
+router.get("/statement/export/pdf", verifyToken, exportStatementPDF);
+
+router.get("/statement/export/excel", verifyToken, exportStatementExcel);
+
+// fix this
 router.get(
   "/accounts/statement/:year/:month",
   verifyToken,
   getMonthlyStatement
 );
+
 router.get("/accounts/report", verifyToken, getDateReport);
 
 router.get("/accounts/report", verifyToken, getReport);
@@ -198,6 +202,8 @@ router.get("/transfers/local", verifyToken, (req, res) => {
   });
 });
 
+router.post("/transfers/local", verifyToken, localTransfer);
+
 // International transfer
 router.get("/transfers/international", verifyToken, (req, res) => {
   res.render("transfers-international", {
@@ -208,6 +214,8 @@ router.get("/transfers/international", verifyToken, (req, res) => {
     active: "transfers",
   });
 });
+
+router.post("/transfers/international", verifyToken, internationalTransfer);
 
 // Mobile deposit
 router.get("/transfers/mobile-deposit", verifyToken, (req, res) => {
@@ -220,33 +228,20 @@ router.get("/transfers/mobile-deposit", verifyToken, (req, res) => {
   });
 });
 
+router.post("/transfers/mobile-deposit", verifyToken, mobileDeposit);
+
 // History
 router.get("/transfers/history", verifyToken, getTransferHistory);
 
-/* router.get("/transfers/history", verifyToken, async (req, res) => {
-  // later will fetch from MongoDB
-  res.render("transfers-history", {
-    layout: "layout",
-    title: "Transfer History",
-    user: req.user,
-    loggedIn: true,
-    active: "transfers",
-    transactions,
-  });
-}); */
+// PIN
+router.post("/pin", verifyToken, updatePin);
+
+
 
 // ==================== LOAN ROUTES ====================
 
 // Loan Application
-router.get("/loan/application", verifyToken, async (req, res) => {
-  res.render("loan-application", {
-    layout: "layout",
-    title: "Loan Application",
-    user: req.user,
-    loggedIn: true,
-    active: "loan",
-  });
-});
+router.get("/loan/status", verifyToken, getLoanStatus);
 
 // Loan Status
 router.get("/loan/status", verifyToken, async (req, res) => {
@@ -259,6 +254,20 @@ router.get("/loan/status", verifyToken, async (req, res) => {
     loans: [], //
   });
 });
+
+router.get("/loan/application", verifyToken, async (req, res) => {
+  res.render("loan-application", {
+    layout: "layout",
+    title: "Loan Application",
+    user: req.user,
+    loggedIn: true,
+    active: "loan",
+    loans: [], //
+  });
+});
+
+// Apply for a loan
+router.post("/loan/application", verifyToken, applyForLoan);
 
 // Analytics page
 router.get("/analytics", verifyToken, (req, res) => {
@@ -309,6 +318,9 @@ router.get("/settings", verifyToken, (req, res) => {
     active: "settings",
   });
 });
+
+// settings
+router.post("/settings", verifyToken, updateSettings);
 
 // Profile page
 router.get("/profile", verifyToken, (req, res) => {
@@ -426,14 +438,3 @@ router.delete("/notifications/:id", verifyToken, async (req, res) => {
 });
 
 module.exports = router;
-
-// Accounts - Statement
-/* router.get("/accounts/statement", verifyToken, async (req, res) => {
-  res.render("accounts-statement", {
-    layout: "layout",
-    title: "Account Statement",
-    user: req.user,
-    loggedIn: true,
-    active: "accounts",
-  });
-}); */

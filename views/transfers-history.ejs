@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/css/transfer-history.css" />
-    <title>History</title>
+    <title>Transfer History</title>
   </head>
   <body>
     <section class="transfer-section transfer-history">
@@ -25,23 +25,33 @@
           <tbody>
             <% transactions.forEach(tx => { %>
             <tr>
-              <td><%= tx.date %></td>
+              <!-- Date -->
+              <td><%= new Date(tx.date).toLocaleString() %></td>
+
+              <!-- Type -->
               <td><%= tx.type %></td>
+
+              <!-- Amount (always normalized to tx.amount in controller) -->
               <td>
-                <% if (tx.debit && tx.debit > 0) { %> -$<%=
-                tx.debit.toLocaleString() %> <% } else if (tx.credit &&
-                tx.credit > 0) { %> +$<%= tx.credit.toLocaleString() %> <% }
-                else { %> $0 <% } %>
-              </td>
-              <td>
-                <% if (tx.status === "Completed") { %>
-                <span class="status completed"><%= tx.status %></span>
-                <% } else if (tx.status === "Pending") { %>
-                <span class="status pending"><%= tx.status %></span>
+                <% if (tx.type === "Debit") { %>
+                  -$<%= tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
                 <% } else { %>
-                <span class="status failed"><%= tx.status %></span>
+                  +$<%= tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
                 <% } %>
               </td>
+
+              <!-- Status -->
+              <td>
+                <% if (tx.status === "Completed") { %>
+                  <span class="status completed"><%= tx.status %></span>
+                <% } else if (tx.status === "Pending") { %>
+                  <span class="status pending"><%= tx.status %></span>
+                <% } else { %>
+                  <span class="status failed"><%= tx.status %></span>
+                <% } %>
+              </td>
+
+              <!-- Description -->
               <td><%= tx.description || "-" %></td>
             </tr>
             <% }) %>

@@ -23,8 +23,11 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/style.css" />
   </head>
-  <body>
+  <body
+    data-theme="<%= user && user.settings ? user.settings.theme : 'light' %>"
+  >
     <!-- Sidebar -->
     <aside class="sidebar" aria-label="Primary">
       <div class="brand">
@@ -200,11 +203,14 @@
           </button>
         </form>
 
+        <!-- notification icon -->
         <div class="topbar__right">
           <button class="icon-btn" aria-label="Notifications" id="notifyBtn">
             <i class="fa fa-bell-o"></i
             ><span class="dot" aria-hidden="true"></span>
           </button>
+
+          <!--  Profile button-->
           <div class="profile">
             <button
               class="profile__btn"
@@ -261,8 +267,8 @@
 
     <!-- Toasts -->
     <div
-      class="toast"
-      id="toast"
+      class="layouttoast"
+      id="layouttoast"
       role="status"
       aria-live="polite"
       aria-atomic="true"

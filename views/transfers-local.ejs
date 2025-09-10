@@ -13,7 +13,7 @@
   </head>
   <body>
     <%- include('partials/toast') %>
-    
+
     <section class="transfer-section">
       <h2 class="transfer-title">Local Transfer</h2>
 
@@ -40,7 +40,9 @@
       <!-- Dynamic Date -->
       <p>
         <strong>Date:</strong>
-        <span id="transferDate"><%= new Date().toISOString().split("T")[0] %></span>
+        <span id="transferDate"
+          ><%= new Date().toISOString().split("T")[0] %></span
+        >
       </p>
 
       <form action="/transfers/local" class="transfer-form">
@@ -106,14 +108,17 @@
         <span class="close-modal" id="ModalClose">&times;</span>
         <h3>Select Beneficiary</h3>
         <ul>
-          <% if (user && user.beneficiaries && user.beneficiaries.length > 0) { %>
-            <% user.beneficiaries.forEach(b => { %>
-              <li data-name="<%= b.name %>" data-account="<%= b.accountNumber %>" data-bank="<%= b.bank %>">
-                <%= b.name %> - <%= b.accountNumber %> (<%= b.bank %>)
-              </li>
-            <% }) %>
-          <% } else { %>
-            <li>No saved beneficiaries</li>
+          <% if (user && user.beneficiaries && user.beneficiaries.length > 0) {
+          %> <% user.beneficiaries.forEach(b => { %>
+          <li
+            data-name="<%= b.name %>"
+            data-account="<%= b.accountNumber %>"
+            data-bank="<%= b.bank %>"
+          >
+            <%= b.name %> - <%= b.accountNumber %> (<%= b.bank %>)
+          </li>
+          <% }) %> <% } else { %>
+          <li>No saved beneficiaries</li>
           <% } %>
         </ul>
       </div>
@@ -121,5 +126,6 @@
 
     <script src="/js/toggleBalance.js"></script>
     <script src="/js/transferlocal.js"></script>
+    <script src="/js/toast.js"></script>
   </body>
 </html>

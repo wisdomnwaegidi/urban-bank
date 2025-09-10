@@ -11,9 +11,11 @@
     <link rel="stylesheet" href="/css/security-pin.css" />
   </head>
   <body>
+    <!-- Toast -->
+    <%- include('partials/toast') %>
+
     <div class="security-container">
       <h2><i class="fa fa-key"></i> Update PIN</h2>
-
       <form action="/security/pin" method="POST" class="security-form">
         <div class="form-group">
           <label for="currentPin">Current PIN</label>

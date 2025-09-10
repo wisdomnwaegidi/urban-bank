@@ -1,25 +1,61 @@
 document.addEventListener("DOMContentLoaded", () => {
   const settingsForm = document.getElementById("settingsForm");
 
-  if (settingsForm) {
-    settingsForm.addEventListener("submit", (e) => {
-      e.preventDefault();
+  settingsForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      const theme = document.getElementById("themeSelect").value;
-      const language = document.getElementById("languageSelect").value;
+    const theme = document.getElementById("themeSelect").value;
+    const language = document.getElementById("languageSelect").value;
 
-      // Example: Apply theme immediately
-      document.body.className = theme;
+    try {
+      const res = await fetch("/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ theme, language }),
+      });
 
-      // Show toast
-      const toast = document.getElementById("toast");
-      if (toast) {
-        toast.textContent = `Settings saved: ${theme} theme, ${language} language`;
-        toast.className = "toast show success";
-        setTimeout(() => (toast.className = "toast"), 3000);
+      const data = await res.json();
+
+      if (data.success) {
+        showToast("Settings saved successfully!", "success");
+
+        // Apply theme instantly
+        document.body.setAttribute("data-theme", theme);
+
+        // (Optional) Trigger language change here
+      } else {
+        showToast("Failed to save settings: " + data.message, "error");
       }
+    } catch (err) {
+      console.error("Error saving settings:", err);
+      showToast("Something went wrong while saving settings.", "error");
+    }
+  });
+  function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    const toastMessage = document.getElementById("toastMessage");
 
-      // TODO: Send updated settings to backend via fetch/axios
-    });
+    if (!toast || !toastMessage) return;
+
+    // Reset classes
+    toast.className = "toast";
+
+    // Apply type-specific class
+    if (type === "success") {
+      toast.classList.add("toast-success");
+    } else if (type === "error") {
+      toast.classList.add("toast-error");
+    }
+
+    // Set message
+    toastMessage.textContent = message;
+
+    // Show toast
+    toast.style.display = "block";
+
+    // Auto-hide after 4s
+    setTimeout(() => {
+      toast.style.display = "none";
+    }, 4000);
   }
 });

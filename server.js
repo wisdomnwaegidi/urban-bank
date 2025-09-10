@@ -8,7 +8,6 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const expressLayouts = require("express-ejs-layouts");
-// const marketRoutes = require("./server/routes/marketRoutes");
 
 dotenv.config();
 const app = express();
@@ -71,7 +70,6 @@ app.use(conditionalLayout);
 // Public routes
 const publicRouter = require("./server/routes/router");
 app.use("/", publicRouter);
-// app.use("/api", marketRoutes);
 
 app.use(
   helmet.contentSecurityPolicy({

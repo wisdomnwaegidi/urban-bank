@@ -242,7 +242,7 @@
   --text_menu_hover: #f7fba4;
   --text_white: #fff;
   --text_black: #000;
-   --text_red: #dc3545;
+  --text_red: #dc3545;
   --text_green: #28a745;
   --bg_gradient: linear-gradient(264.77deg, #f7fba4 28.87%, #64dcb6 90.04%);
   --bg_body: #222828;
@@ -269,12 +269,27 @@
 html {
   overflow-x: hidden;
 }
-body {
+
+/* Light mode */
+ /* body[data-theme="light"] {
+  background: var(--bg_white);
+  color: #222828;
+}  */
+
+/* Dark mode */
+ /* body[data-theme="dark"] {
   overflow-x: hidden !important;
   background: #222828;
   padding: 0;
   margin: 0;
-}
+}  */
+
+ body {
+  overflow-x: hidden !important;
+  background: #222828;
+  padding: 0;
+  margin: 0;
+} 
 * {
   -ms-overflow-style: none;
   scrollbar-width: none;
