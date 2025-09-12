@@ -3,8 +3,8 @@
 <!-- Welcome -->
 <section class="welcome">
   <h1>
-    Welcome <% if (user && user.firstName) { %> <%= user.firstName %> <% } else
-    { %> User <% } %>
+    Welcome <% if (user && user.firstName && user.lastName) { %> <%= user.firstName +
+      " " + user.lastName %> <% } else { %> User <% } %>
   </h1>
   <marquee behavior="" direction="">
     <div class="market-ticker">
@@ -65,8 +65,8 @@
         </tr>
       </thead>
       <tbody>
-        <% if (currentIndices && currentIndices.length > 0) { %> <% currentIndices.forEach(row => {
-        %>
+        <% if (currentIndices && currentIndices.length > 0) { %> <%
+        currentIndices.forEach(row => { %>
         <tr>
           <td><%= row.EUR %></td>
           <td><%= row.USD %></td>
@@ -98,35 +98,39 @@
         </tr>
       </thead>
       <tbody>
-        <% if (transactions && transactions.length > 0) { %> <%
-        transactions.forEach(tx => { %>
-        <tr>
-          <td><%= user.account %></td>
-          <td>
-            <% if (tx.debit && tx.debit > 0) { %> -$<%=
-            tx.debit.toLocaleString() %> <% } else if (tx.credit && tx.credit >
-            0) { %> +$<%= tx.credit.toLocaleString() %> <% } else { %> $0.00 <%
-            } %>
-          </td>
-          <td>
-            <% if (tx.debit && tx.debit > 0) { %>
-            <span class="badge badge-danger">Debit</span>
-            <% } else if (tx.credit && tx.credit > 0) { %>
-            <span class="badge badge-success">Credit</span>
-            <% } else { %>
-            <span class="badge">N/A</span>
-            <% } %>
-          </td>
-          <td><%= new Date(tx.date).toLocaleString() %></td>
-        </tr>
-        <% }) %> <% } else { %>
-        <tr>
-          <td colspan="4">No recent transactions</td>
-        </tr>
+        <% if (transactions && transactions.length > 0) { %>
+          <% transactions.forEach(tx => { %>
+            <tr>
+              <td><%= user.account %></td>
+              <td>
+                <% if (tx.debit > 0) { %>
+                  -$<%= tx.debit.toLocaleString() %>
+                <% } else if (tx.credit > 0) { %>
+                  +$<%= tx.credit.toLocaleString() %>
+                <% } else { %>
+                  $0.00
+                <% } %>
+              </td>
+              <td>
+                <% if (tx.debit > 0) { %>
+                  <span class="badge badge-danger">Debit</span>
+                <% } else if (tx.credit > 0) { %>
+                  <span class="badge badge-success">Credit</span>
+                <% } else { %>
+                  <span class="badge">N/A</span>
+                <% } %>
+              </td>
+              <td><%= new Date(tx.date).toLocaleString() %></td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="4">No recent transactions</td>
+          </tr>
         <% } %>
       </tbody>
     </table>
   </div>
 </section>
 
-
+<script src="/js/load-transaction.js"></script>

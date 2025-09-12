@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const expressLayouts = require("express-ejs-layouts");
 
+
 dotenv.config();
 const app = express();
 const PORT = Number(process.env.PORT) || 8081;
@@ -70,6 +71,10 @@ app.use(conditionalLayout);
 // Public routes
 const publicRouter = require("./server/routes/router");
 app.use("/", publicRouter);
+
+// Refactor publicRouter to pages without auth
+// Refactor publicRouter pages with auth
+// Refactor publicRouter protected routes with token
 
 app.use(
   helmet.contentSecurityPolicy({

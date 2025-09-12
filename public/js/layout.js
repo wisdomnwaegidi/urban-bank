@@ -1,3 +1,6 @@
+
+
+
 // Profile dropdown toggle
 function attachProfileListeners() {
   const profile = document.querySelector(".profile");
@@ -30,25 +33,35 @@ function attachLogoutListener() {
     e.preventDefault();
 
     // Client-side toast
-    showToast("Logging out…", "info");
+  toast("Logging out…", "info");
 
     // Redirect to backend logout route
     window.location.href = "/logout";
   });
 }
 
-// Toast helper
-function showToast(message, type = "info") {
-  const toast = document.getElementById("layouttoast");
-  if (!toast) return;
+// Toast notification system
+/* function showToast(message, type) {
+  const toast = document.getElementById("toast");
+  const toastMessage = document.getElementById("toastMessage");
+  if (!toast || !toastMessage) return;
 
-  toast.textContent = message;
-  toast.className = `layouttoast show ${type}`;
+  toastMessage.textContent = message;
+  toast.className = "toast"; // reset
+  toast.classList.add(type === "success" ? "toast-success" : "toast-error");
+  toast.classList.remove("hidden");
+  toast.style.display = "block";
+
+  setTimeout(() => toast.classList.add("show"), 10);
 
   setTimeout(() => {
-    toast.className = "layouttoast";
-  }, 3000);
-}
+    toast.classList.remove("show");
+    setTimeout(() => {
+      toast.classList.add("hidden");
+      toast.style.display = "none";
+    }, 300);
+  }, 4000);
+} */
 
 // CLICK-ONLY Sidebar submenu toggle
 function attachSubmenuListeners() {
@@ -187,12 +200,12 @@ function attachSearchListener() {
 
     if (query) {
       console.log("Searching for:", query);
-      showToast(`Searching for: ${query}`, "info");
+     toast(`Searching for: ${query}`, "info");
 
       // Example: redirect to search results page
       // window.location.href = `/search?q=${encodeURIComponent(query)}`;
     } else {
-      showToast("Please enter a search query", "info");
+     toast("Please enter a search query", "info");
     }
   });
 }
@@ -206,7 +219,7 @@ function initNotifications() {
   notifyBtn.addEventListener("click", (e) => {
     e.preventDefault();
     console.log("Notification button clicked");
-    showToast("Notifications feature coming soon", "info");
+    toast("Notifications feature coming soon", "info");
   });
 }
 

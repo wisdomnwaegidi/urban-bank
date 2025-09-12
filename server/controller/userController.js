@@ -5,11 +5,19 @@ const { validationResult } = require("express-validator");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const NotificationService = require("../services/notificationService");
-const Transaction = require("../models/Transaction");
+const Transaction = require("../models/transaction");
 const axios = require("axios");
 const PDFDocument = require("pdfkit");
 const ExcelJS = require("exceljs");
 const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
+const {
+  generateCardNumber,
+  generateCVV,
+  generateExpiry,
+} = require("../utils/cardGenerator");
+const Card = require("../models/cards");
+const Beneficiary = require("../models/beneficiaries");
+const Support = require("../models/support");
 
 exports.registerUser = async (req, res) => {
   const errors = validationResult(req);
@@ -40,16 +48,13 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create user
     const user = new Userdb({
       firstName,
       lastName,
       email,
       phone,
-      password: hashedPassword,
+      password,
     });
 
     const savedUser = await user.save();
@@ -86,7 +91,7 @@ exports.loginUser = async (req, res) => {
   }
 
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     const user = await Userdb.findOne({ email });
 
@@ -102,7 +107,7 @@ exports.loginUser = async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1d",
+      expiresIn: rememberMe ? "7d" : "1d",
     });
 
     res.cookie("auth_token", token, {
@@ -153,11 +158,11 @@ exports.resetPassword = async (req, res) => {
     }
 
     // Hash the new password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt);
+   /*  const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt); */
 
     // Update user's password and clear the reset token fields
-    user.password = hashedPassword;
+    user.password = newPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
 
@@ -346,6 +351,7 @@ exports.contactUs = async (req, res) => {
   }
 };
 
+// POST NEWSLTTER
 exports.newsLetter = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -371,6 +377,7 @@ exports.newsLetter = async (req, res) => {
   }
 };
 
+//POST KYC
 exports.submitKyc = async (req, res) => {
   const { fullname, dob, idType, idNumber, address } = req.body;
 
@@ -423,12 +430,19 @@ exports.submitKyc = async (req, res) => {
 exports.localTransfer = async (req, res) => {
   console.log("Transfer Data Received:", req.body);
   try {
-    const userId = req.user ? req.user._id : null; // from JWT/session
+    const userId = req.user ? req.user._id : null;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    const { beneficiaryName, beneficiaryBank, amount, description } = req.body;
-    const transferAmount = parseFloat(amount);
+    const {
+      beneficiaryName,
+      beneficiaryAccount,
+      beneficiaryBank,
+      amount,
+      description,
+      saveBeneficiary,
+    } = req.body;
 
+    const transferAmount = parseFloat(amount);
     if (!transferAmount || transferAmount <= 0) {
       return res.status(400).json({ message: "Invalid transfer amount" });
     }
@@ -440,7 +454,6 @@ exports.localTransfer = async (req, res) => {
     const charges = 7;
     const totalDebit = transferAmount + charges;
 
-    // Check funds
     if (user.accountBalance < totalDebit) {
       return res.status(400).json({ message: "Insufficient funds" });
     }
@@ -448,7 +461,7 @@ exports.localTransfer = async (req, res) => {
     // Deduct balance
     user.accountBalance -= totalDebit;
 
-    // Create new Transaction doc
+    // Create new Transaction
     const newTx = await Transaction.create({
       userId,
       date: new Date(),
@@ -459,10 +472,8 @@ exports.localTransfer = async (req, res) => {
       balance: user.accountBalance,
     });
 
-    // Add Transaction _id to user's transactions (refs)
+    // Push to refs + history
     user.transactions.push(newTx._id);
-
-    // Add lightweight record to transactionsHistory
     user.transactionsHistory.push({
       type: "Debit",
       amount: transferAmount,
@@ -471,17 +482,60 @@ exports.localTransfer = async (req, res) => {
         description || `Transfer to ${beneficiaryName} (${beneficiaryBank})`,
     });
 
-    // Save user
     await user.save();
+
+    // ✅ Save beneficiary if requested
+    if (saveBeneficiary === "on") {
+      const existing = await Beneficiary.findOne({
+        userId,
+        accountNumber: beneficiaryAccount,
+      });
+
+      if (!existing) {
+        await Beneficiary.create({
+          userId,
+          name: beneficiaryName,
+          accountNumber: beneficiaryAccount,
+          bank: beneficiaryBank,
+        });
+      }
+    }
+
+    // ✅ Fetch updated beneficiaries list
+    const beneficiaries = await Beneficiary.find({ userId }).lean();
 
     res.status(200).json({
       message: "Transfer successful",
       newBalance: user.accountBalance,
       transactionId: newTx._id,
+      beneficiaries, // <-- return updated list
     });
   } catch (err) {
     console.error("Transfer error:", err);
     res.status(500).json({ message: "Error processing transfer" });
+  }
+};
+
+// GET /transfers/local
+exports.getLocalTransfer = async (req, res) => {
+  try {
+    const userId = req.user?._id;
+    if (!userId) return res.redirect("/login");
+
+    const user = await Userdb.findById(userId).lean();
+    const beneficiaries = await Beneficiary.find({ userId }).lean();
+
+    res.render("transfers-local", {
+      layout: "layout",
+      title: "Local Transfer",
+      user,
+      beneficiaries,
+      loggedIn: true,
+      active: "transfers",
+    });
+  } catch (err) {
+    console.error("Error loading transfer page:", err);
+    res.status(500).send("Server Error");
   }
 };
 
@@ -679,10 +733,7 @@ exports.getMonthlyStatement = async (req, res) => {
       (sum, tx) => sum + (tx.credit || 0),
       0
     );
-    const totalDebits = monthlyTx.reduce(
-      (sum, tx) => sum + (tx.debit || 0),
-      0
-    );
+    const totalDebits = monthlyTx.reduce((sum, tx) => sum + (tx.debit || 0), 0);
     const netBalance = totalCredits - totalDebits;
 
     res.render("accounts-monthly-statement", {
@@ -704,10 +755,12 @@ exports.getMonthlyStatement = async (req, res) => {
 exports.getDateReport = async (req, res) => {
   try {
     const { fromDate, toDate } = req.query;
-    const user = await Userdb.findById(req.user.id);
-    if (!user) return res.status(404).send("User not found");
 
-    const reportTx = user.transactions.filter((tx) => {
+    // populate transactions
+    const user = await Userdb.findById(req.user.id).populate("transactions");
+    if (!user) return res.status(404).json("User not found");
+
+    const reportTx = (user.transactions || []).filter((tx) => {
       const d = new Date(tx.date);
       return d >= new Date(fromDate) && d <= new Date(toDate);
     });
@@ -743,67 +796,7 @@ exports.getDateReport = async (req, res) => {
     });
   } catch (err) {
     console.error("Date Report Error:", err);
-    res.status(500).send("Error generating report");
-  }
-};
-
-// GET /accounts/report
-exports.getReport = async (req, res) => {
-  try {
-    const user = await Userdb.findById(req.user.id);
-    if (!user) return res.status(404).send("User not found");
-
-    // Read filter dates
-    const { fromDate, toDate } = req.query;
-
-    let transactions = user.transactions;
-
-    // Filter by date range if provided
-    if (fromDate && toDate) {
-      const from = new Date(fromDate);
-      const to = new Date(toDate);
-
-      transactions = transactions.filter((tx) => {
-        const txDate = new Date(tx.date);
-        return txDate >= from && txDate <= to;
-      });
-    }
-
-    // Calculate totals
-    const totalCredits = transactions.reduce(
-      (sum, tx) => sum + (tx.credit || 0),
-      0
-    );
-    const totalDebits = transactions.reduce(
-      (sum, tx) => sum + (tx.debit || 0),
-      0
-    );
-    const balance = user.accountBalance;
-
-    // Group by month
-    const monthlySummary = {};
-    transactions.forEach((tx) => {
-      const monthKey = tx.date.toISOString().slice(0, 7); // YYYY-MM
-      if (!monthlySummary[monthKey]) {
-        monthlySummary[monthKey] = { credits: 0, debits: 0 };
-      }
-      monthlySummary[monthKey].credits += tx.credit || 0;
-      monthlySummary[monthKey].debits += tx.debit || 0;
-    });
-
-    res.render("accounts-report", {
-      user,
-      transactions: transactions.slice(-50).reverse(), // last 50 filtered tx
-      totalCredits,
-      totalDebits,
-      balance,
-      monthlySummary,
-      fromDate,
-      toDate,
-    });
-  } catch (err) {
-    console.error("Report Error:", err);
-    res.status(500).send("Error loading report");
+    res.status(500).json("Error generating report");
   }
 };
 
@@ -814,7 +807,7 @@ exports.getTransferHistory = async (req, res) => {
       .populate("transactions") // fetch Transaction docs
       .lean();
 
-    if (!user) return res.status(404).send("User not found");
+    if (!user) return res.status(404).json({ message: "User not found" });
 
     // Local transfers (Transaction model: debit/credit)
     const localTx = (user.transactions || []).map((tx) => ({
@@ -839,13 +832,15 @@ exports.getTransferHistory = async (req, res) => {
       (a, b) => new Date(b.date) - new Date(a.date)
     );
 
+    console.log(allTransactions);
+
     res.render("transfers-history", {
       user,
       transactions: allTransactions.slice(0, 50),
     });
   } catch (err) {
     console.error("Error fetching transfer history:", err);
-    res.status(500).send("Error loading transfer history");
+    res.status(500).json({ message: "Error fetching transfer history" });
   }
 };
 
@@ -855,7 +850,9 @@ exports.exportStatementPDF = async (req, res) => {
     const user = await Userdb.findById(req.user.id);
     if (!user) return res.status(404).send("User not found");
 
-    const transactions = await Transaction.find({ userId: user._id }).sort({ date: -1 });
+    const transactions = await Transaction.find({ userId: user._id }).sort({
+      date: -1,
+    });
 
     // PDF setup
     const doc = new PDFDocument({ margin: 30 });
@@ -873,15 +870,17 @@ exports.exportStatementPDF = async (req, res) => {
     doc.moveDown();
 
     // Table Header
-    doc.fontSize(12).text("Date | Description | Debit | Credit | Balance", { underline: true });
+    doc.fontSize(12).text("Date | Description | Debit | Credit | Balance", {
+      underline: true,
+    });
     doc.moveDown(0.5);
 
     // Transactions
     transactions.forEach((tx) => {
       doc.text(
-        `${tx.date.toISOString().slice(0, 10)} | ${tx.description} | ${tx.debit || "-"} | ${
-          tx.credit || "-"
-        } | ${tx.balance}`
+        `${tx.date.toISOString().slice(0, 10)} | ${tx.description} | ${
+          tx.debit || "-"
+        } | ${tx.credit || "-"} | ${tx.balance}`
       );
     });
 
@@ -898,7 +897,9 @@ exports.exportStatementExcel = async (req, res) => {
     const user = await Userdb.findById(req.user.id);
     if (!user) return res.status(404).send("User not found");
 
-    const transactions = await Transaction.find({ userId: user._id }).sort({ date: -1 });
+    const transactions = await Transaction.find({ userId: user._id }).sort({
+      date: -1,
+    });
 
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet("Statement");
@@ -917,10 +918,7 @@ exports.exportStatementExcel = async (req, res) => {
       ]);
     });
 
-    res.setHeader(
-      "Content-Disposition",
-      "attachment; filename=statement.xlsx"
-    );
+    res.setHeader("Content-Disposition", "attachment; filename=statement.xlsx");
     res.setHeader(
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -1042,7 +1040,7 @@ async function fetchStockIndex(ticker) {
 }; */
 // End Overview hardcoded data and API integration
 
-// POST /loan/application
+// POST /loan/application controller
 exports.applyForLoan = async (req, res) => {
   try {
     const user = await Userdb.findById(req.user.id);
@@ -1074,7 +1072,7 @@ exports.applyForLoan = async (req, res) => {
   }
 };
 
-// GET /loan/status
+// GET /loan/status con
 exports.getLoanStatus = async (req, res) => {
   try {
     const user = await Userdb.findById(req.user.id);
@@ -1127,9 +1125,7 @@ exports.updatePassword = async (req, res) => {
       return res.status(400).json({ message: "Current password is incorrect" });
     }
 
-    // Hash new password
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(newPassword, salt);
+    user.password = newPassword
 
     await user.save();
 
@@ -1143,42 +1139,38 @@ exports.updatePassword = async (req, res) => {
 // Update PIN
 exports.updatePin = async (req, res) => {
   try {
-    const user = await Userdb.findById(req.user.id); // req.user comes from JWT middleware
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const { currentPin, newPin } = req.body;
+    const userId = req.user?._id;
+
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const user = await Userdb.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Check current PIN only if user already has one
+    if (user.pin) {
+      const isMatch = await user.comparePin(currentPin);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Current PIN is incorrect" });
+      }
     }
 
-    const { currentPin, newPin, confirmPin } = req.body;
-
-    if (!currentPin || !newPin || !confirmPin) {
-      return res.status(400).json({ message: "All fields are required" });
-    }
-
-    if (newPin !== confirmPin) {
-      return res.status(400).json({ message: "New PINs do not match" });
-    }
-
-    // ✅ Use schema method to compare current pin
-    const isMatch = await user.comparePin(currentPin);
-    if (!isMatch) {
-      return res.status(400).json({ message: "Current PIN is incorrect" });
-    }
-
-    // ✅ Assign new pin, will be hashed automatically in pre-save hook
+    // Set new PIN (pre-save hook will hash it)
     user.pin = newPin;
     await user.save();
 
     res.status(200).json({ message: "PIN updated successfully" });
   } catch (err) {
     console.error("Error updating PIN:", err);
-    res.status(500).json({ message: "Server error updating PIN" });
+    res.status(500).json({ message: "Error updating PIN" });
   }
 };
+
 
 // settings
 exports.updateSettings = async (req, res) => {
   try {
-    const userId = req.user.id; // from JWT middleware
+    const userId = Userdb.findById(req.user.id); // from JWT middleware
     const { theme, language } = req.body;
 
     const user = await Userdb.findByIdAndUpdate(
@@ -1207,6 +1199,127 @@ exports.updateSettings = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Error updating settings" });
+  }
+};
+
+// POST /api/cards/apply
+exports.cards = async (req, res) => {
+  try {
+    const { network, type } = req.body;
+    const userId = req.user ? req.user._id : null;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+
+    // 🔹 Check if card already exists for this network + type
+    let card = await Card.findOne({ userId, network, type });
+    if (card) {
+      return res.json({ success: true, card, message: "Card already exists" });
+    }
+
+    // Otherwise, create new card
+    const number = generateCardNumber();
+    const cvv = generateCVV();
+    const expiry = generateExpiry();
+
+    card = new Card({ userId, network, type, number, cvv, expiry });
+    await card.save();
+
+    res.status(201).json({ success: true, card });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.getCards = async (req, res) => {
+  try {
+    const cards = await Card.find({ userId: req.user._id }).lean();
+    res.json({
+      success: true,
+      cards,
+      userFullName: `${req.user.firstName} ${req.user.lastName}`,
+    });
+  } catch (err) {
+    console.error("Error fetching cards:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// support
+exports.support = async (req, res) => {
+  try {
+    const user = await Userdb.findById(req.user.id); // req.user comes from JWT middleware
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { email, issue } = req.body;
+
+    if (!email || !issue) {
+      return res
+        .status(400)
+        .json({ success: false, message: "All fields required" });
+    }
+
+    const support = new Support({
+      userId: user._id,
+      email,
+      issue,
+    });
+    await support.save();
+
+    res
+      .status(201)
+      .json({ success: true, message: "Support request submitted" });
+  } catch (err) {
+    console.error("Support error:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Admin: Get all support requests
+exports.getSupportRequests = async (req, res) => {
+  try {
+    const requests = await Support.find()
+      .populate("userId", "firstName lastName email")
+      .sort({ createdAt: -1 });
+
+    res.render("/admin/support-requests", {
+      layout: "layout",
+      title: "Support Requests",
+      user: req.user, // from verifyToken
+      loggedIn: true,
+      active: "support",
+      requests,
+    });
+  } catch (err) {
+    console.error("Error fetching support requests:", err);
+    res.status(500).send("Server Error");
+  }
+};
+
+// Admin: Update support request status
+exports.updateSupportStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body; // "Pending", "In Progress", "Resolved"
+
+    const updated = await Support.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ success: false, message: "Support request not found" });
+    }
+
+    res.json({ success: true, message: "Support status updated", request: updated });
+  } catch (err) {
+    console.error("Error updating support status:", err);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 

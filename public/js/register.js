@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (regex && !regex.test(input.value.trim())) {
       isValid = false;
     }
-    input.style.border = isValid ? "1px solid green" : "1px solid red";
     return isValid;
   };
 
@@ -43,7 +42,6 @@ document.addEventListener("DOMContentLoaded", function () {
       passwordInput.value === confirmPasswordInput.value;
 
     if (!isConfirmPasswordValid) {
-      confirmPasswordInput.style.border = "1px solid red";
       showToast("Passwords do not match", "ERROR");
       return;
     }

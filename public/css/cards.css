@@ -129,3 +129,27 @@
   background: var(--bg_gradient_hover);
   transform: translateY(-2px);
 }
+
+
+/* Chip image */
+.card-chip {
+  width: 50px;
+  height: auto;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* Network-specific card colors */
+.card.mastercard .card-visual {
+  background: linear-gradient(135deg, #ff4d4d, #cc0000);
+}
+
+.card.visa .card-visual {
+  background: linear-gradient(135deg, #4da6ff, #0052cc);
+}
+
+.card.verve .card-visual {
+  background: linear-gradient(135deg, #33cc33, #006600);
+}
+
+

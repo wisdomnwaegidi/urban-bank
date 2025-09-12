@@ -36,4 +36,29 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("Something went wrong. Please try again.", "ERROR");
     }
   });
+
+  // show tost function
+   function showToast(message, type = "SUCCESS") {
+     const toast = document.getElementById("toast");
+     const toastMessage = document.getElementById("toastMessage");
+     if (!toast || !toastMessage) return;
+
+     toastMessage.textContent = message;
+     toast.className = "toast";
+     toast.classList.add(type === "SUCCESS" ? "toast-success" : "toast-error");
+     toast.classList.remove("hidden");
+     toast.style.display = "block";
+
+     setTimeout(() => {
+       toast.classList.add("show");
+     }, 10);
+
+     setTimeout(() => {
+       toast.classList.remove("show");
+       setTimeout(() => {
+         toast.classList.add("hidden");
+         toast.style.display = "none";
+       }, 300);
+     }, 4000);
+   }s
 });

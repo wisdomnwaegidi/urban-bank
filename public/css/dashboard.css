@@ -463,29 +463,6 @@ select {
   color: var(--text_paragraph_color);
 }
 
-/* Toast */
-.layouttoast {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  min-width: 240px;
-  max-width: 360px;
-  background: var(--bg_othe_1);
-  border: 1px solid var(--border_color);
-  color: var(--text_white);
-  border-radius: 12px;
-  padding: 12px 14px;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-.layouttoast.show {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
 /* CLICK-ONLY SUBMENU STYLES */
 .has-submenu {
   position: relative;

@@ -13,31 +13,32 @@
 
     <div class="content">
       <div class="grid two">
-        <!-- Existing Card -->
-        <div class="card">
+        <!-- Card Preview -->
+        <div class="card" id="cardPreview">
           <div class="card__head">
-            <h2>My Card</h2>
+            <h2>My Cards</h2>
           </div>
-          <div class="card-visual">
+          <div class="card-visual visa">
+            <img src="/image/chip-one.png" alt="Chip" class="card-chip" />
             <div class="row">
-              <span><%= card ? card.type : 'Debit' %></span>
+              <span id="previewType">Debit</span>
               <img
-                src="/image/hd-mastercard-payment-logo-transparent.png"
-                alt="MasterCard"
+                id="previewLogo"
+                src="/image/visa-logo.png"
+                alt="Visa"
                 class="card-logo"
               />
             </div>
-            <div class="digits">
-              <%= card ? card.number : '**** **** **** ****' %>
-            </div>
+            <div class="digits" id="previewNumber">**** **** **** ****</div>
             <div class="row">
-              <span>CVV: <%= card ? card.cvv : 'xxx' %></span>
-              <span>Expiry: <%= card ? card.expiry : 'xx/xx' %></span>
+              <span>CVV: xxx</span>
+              <span>Expiry: xx/xx</span>
             </div>
             <div class="row name">
-              <strong>
-                <%= user ? user.firstName + " " + user.lastName : "Full Name" %>
-              </strong>
+              <strong
+                ><%= user ? user.firstName + " " + user.lastName : "Full Name"
+                %></strong
+              >
             </div>
           </div>
         </div>
@@ -48,15 +49,15 @@
           <form id="cardForm">
             <label>
               Card Network
-              <select name="network" required>
-                <option value="MasterCard">Master Card</option>
+              <select name="network" id="networkSelect" required>
                 <option value="Visa">Visa</option>
+                <option value="MasterCard">Master Card</option>
                 <option value="Verve">Verve</option>
               </select>
             </label>
             <label>
               Card Type
-              <select name="type" required>
+              <select name="type" id="typeSelect" required>
                 <option value="Debit">Debit</option>
                 <option value="Credit">Credit</option>
                 <option value="Prepaid">Prepaid</option>
@@ -67,5 +68,7 @@
         </div>
       </div>
     </div>
+
+    <script src="/js/cards.js"></script>
   </body>
 </html>

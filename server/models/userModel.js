@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       match: [/^\d+$/, "Phone number must contain only digits"],
     },
+
     password: { type: String, required: true },
 
     // 🔐 PIN (hashed)
@@ -27,6 +28,10 @@ const userSchema = new mongoose.Schema(
       minlength: 4,
       maxlength: 1024, // hash length
     },
+
+    // Password Reset Fields
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
 
     // Profile Info
     dob: { type: Date },
@@ -70,7 +75,7 @@ const userSchema = new mongoose.Schema(
     },
     account: {
       type: String,
-      match: [/^\d{6,12}$/, "Account must be 6-12 digits"],
+      match: [/^\d{10}$/, "Account must be exactly 10 digits"], // 👈 fixed at 10 digits
     },
 
     // KYC verification
@@ -82,7 +87,14 @@ const userSchema = new mongoose.Schema(
     },
 
     // Account Status
-    accountBalance: { type: Number, default: 40000 },
+    accountBalance: { type: Number, default: 666000 },
+
+    // roles
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
 
     // Transactions history
     transactions: [
@@ -140,7 +152,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 🔒 Pre-save hook for password and pin
+// 🔒 Pre-save hook for password, pin, currency, and account number
 userSchema.pre("save", async function (next) {
   try {
     // Hash password if modified
@@ -153,6 +165,32 @@ userSchema.pre("save", async function (next) {
       this.pin = await bcrypt.hash(this.pin, 10);
     }
 
+    // Assign default currency if not provided
+    if (!this.currency) {
+      this.currency = "DOLLAR";
+    }
+
+    // Generate account number if not already set
+    if (!this.account) {
+      let accountNumber;
+      let exists = true;
+
+      while (exists) {
+        // Generate a random 10-digit number
+        accountNumber = Math.floor(
+          1000000000 + Math.random() * 9000000000
+        ).toString();
+
+        // Ensure uniqueness
+        const existingUser = await mongoose
+          .model("Userdb")
+          .findOne({ account: accountNumber });
+        if (!existingUser) exists = false;
+      }
+
+      this.account = accountNumber;
+    }
+
     next();
   } catch (err) {
     next(err);
@@ -161,7 +199,19 @@ userSchema.pre("save", async function (next) {
 
 // Method to compare PIN
 userSchema.methods.comparePin = async function (enteredPin) {
+  if (!this.pin) {
+    throw new Error("PIN is not set for this user");
+  }
   return await bcrypt.compare(enteredPin, this.pin);
 };
+
+
+// Method to compare password
+userSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// temporary clear password after reset
+userSchema.index({ resetPasswordExpires: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model("Userdb", userSchema);

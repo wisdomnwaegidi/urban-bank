@@ -1,0 +1,37 @@
+.bw_reset_password_wrap {
+  width: 90%;
+  max-width: 600px;
+  margin: auto;
+}
+
+.bw_reset_password_wrap form {
+  background: var(--bg_othe_1);
+    border-radius: 10px;
+}
+
+.bw_sub_title {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.bw__custom__btn__wrap {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-betwee;
+}
+
+.bw__p__wrap .bw_login_click {
+  background: var(--text_gradient);
+}
+
+.bw_custom_input {
+  display: block;
+  width: calc(100% - 2rem) !important; 
+  margin: 1rem auto !important; 
+  padding: 0.8rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #ccc);
+  background: #fff;
+  box-sizing: border-box;
+}

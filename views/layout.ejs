@@ -81,6 +81,9 @@
               ><i class="fa fa-credit-card"></i><span>Cards</span></a
             >
           </li>
+          <% if (user && user.role === 'admin') { %>
+          <li><a href="/admin/support" class="nav-link <%= typeof active !== 'undefined' && active === 'support' ? 'active' : '' %>">Support Tickets</a></li>
+          <% } %>
           <li class="has-submenu">
             <a
               class="nav-link <%= typeof active !== 'undefined' && active === 'transfers' ? 'active' : '' %>"
@@ -255,6 +258,10 @@
 
       <!-- Main -->
       <main class="content" id="content">
+        <!-- Toast -->
+        <%- include('partials/toast') %> <%- include('partials/dashboard-toast')
+        %>
+
         <!-- Page content will be inserted here -->
         <%- body %>
       </main>
@@ -264,15 +271,6 @@
         <p>© <span id="year"></span> Union Ledger Bank. All rights reserved.</p>
       </footer>
     </div>
-
-    <!-- Toasts -->
-    <div
-      class="layouttoast"
-      id="layouttoast"
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-    ></div>
 
     <!-- Support Modal -->
     <div class="modal" id="supportModal" aria-hidden="true">
@@ -306,6 +304,8 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/js/userAction.js"></script>
+    <script src="/js/layout.js"></script>
+    <script src="/js/support.js"></script>
+    <script src="/js/dashboardToast.js"></script>
   </body>
 </html>

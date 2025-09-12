@@ -108,9 +108,10 @@
         <span class="close-modal" id="ModalClose">&times;</span>
         <h3>Select Beneficiary</h3>
         <ul>
-          <% if (user && user.beneficiaries && user.beneficiaries.length > 0) {
-          %> <% user.beneficiaries.forEach(b => { %>
+          <% if (beneficiaries && beneficiaries.length > 0) { %> <%
+          beneficiaries.forEach(b => { %>
           <li
+            data-valid="true"
             data-name="<%= b.name %>"
             data-account="<%= b.accountNumber %>"
             data-bank="<%= b.bank %>"
@@ -123,7 +124,7 @@
         </ul>
       </div>
     </div>
-
+  
     <script src="/js/toggleBalance.js"></script>
     <script src="/js/transferlocal.js"></script>
     <script src="/js/toast.js"></script>

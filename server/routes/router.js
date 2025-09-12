@@ -16,10 +16,10 @@ const {
   contactUs,
   submitKyc,
   localTransfer,
+  getLocalTransfer,
   getStatement,
   getMonthlyStatement,
   getDateReport,
-  getReport,
   getTransferHistory,
   getOverview,
   internationalTransfer,
@@ -31,8 +31,17 @@ const {
   updateSettings,
   exportStatementPDF,
   exportStatementExcel,
+  cards,
+  getCards,
+  support,
 } = require("../controller/userController");
 const upload = require("../middleware/multer");
+const isAdmin = require("../middleware/isAdmin");
+const {
+  getSupportRequests,
+  updateSupportStatus,
+} = require("../controller/userController");
+
 const router = express.Router();
 
 /* ===========================
@@ -130,8 +139,6 @@ router.get("/reset-password", async (req, res) =>
 
 router.post("/reset-password", resetPassword);
 
-router.post("/security/password", verifyToken, updatePassword);
-
 router.post("/contact-us", contactUs);
 
 /* ===========================
@@ -175,8 +182,7 @@ router.get(
 
 router.get("/accounts/report", verifyToken, getDateReport);
 
-router.get("/accounts/report", verifyToken, getReport);
-//End Accounts - Statement Data API
+// router.get("/accounts/report", verifyToken, getReport);
 
 // Cards page
 router.get("/cards", verifyToken, (req, res) => {
@@ -190,18 +196,15 @@ router.get("/cards", verifyToken, (req, res) => {
   });
 });
 
-// Transfers page
-// Local transfer
-router.get("/transfers/local", verifyToken, (req, res) => {
-  res.render("transfers-local", {
-    layout: "layout",
-    title: "Local Transfer",
-    user: req.user,
-    loggedIn: true,
-    active: "transfers",
-  });
-});
+router.post("/cards/apply", verifyToken, cards);
 
+router.get("/cards", verifyToken, getCards);
+
+// Transfers page
+// GET route (use controller, not inline render) // Local transfer
+router.get("/transfers/local", verifyToken, getLocalTransfer);
+
+// POST route
 router.post("/transfers/local", verifyToken, localTransfer);
 
 // International transfer
@@ -233,11 +236,6 @@ router.post("/transfers/mobile-deposit", verifyToken, mobileDeposit);
 // History
 router.get("/transfers/history", verifyToken, getTransferHistory);
 
-// PIN
-router.post("/pin", verifyToken, updatePin);
-
-
-
 // ==================== LOAN ROUTES ====================
 
 // Loan Application
@@ -251,7 +249,7 @@ router.get("/loan/status", verifyToken, async (req, res) => {
     user: req.user,
     loggedIn: true,
     active: "loan",
-    loans: [], //
+    loans: [],
   });
 });
 
@@ -266,10 +264,10 @@ router.get("/loan/application", verifyToken, async (req, res) => {
   });
 });
 
-// Apply for a loan
+// loan route
 router.post("/loan/application", verifyToken, applyForLoan);
 
-// Analytics page
+// Analytics route
 router.get("/analytics", verifyToken, (req, res) => {
   res.render("analytics", {
     layout: "layout",
@@ -280,7 +278,7 @@ router.get("/analytics", verifyToken, (req, res) => {
   });
 });
 
-// Security page
+// Security routes
 router.get("/security/:type", verifyToken, async (req, res) => {
   const { type } = req.params;
 
@@ -308,7 +306,7 @@ router.get("/security/:type", verifyToken, async (req, res) => {
   });
 });
 
-// Settings page
+// Settings route
 router.get("/settings", verifyToken, (req, res) => {
   res.render("settings", {
     layout: "layout",
@@ -319,10 +317,15 @@ router.get("/settings", verifyToken, (req, res) => {
   });
 });
 
-// settings
+router.post("/security/password", verifyToken, updatePassword);
+
+// updatePin;
+router.post("/security/pin", verifyToken, updatePin);
+
+// POST settings
 router.post("/settings", verifyToken, updateSettings);
 
-// Profile page
+// Profile routes
 router.get("/profile", verifyToken, (req, res) => {
   res.render("profile", {
     layout: "layout",
@@ -339,6 +342,13 @@ router.get("/logout", verifyToken, logout);
 // Profile update routes
 router.put("/profile/:userId/details", verifyToken, profileDetails);
 router.put("/profile/:userId/picture", verifyToken, upload, profilePicture);
+
+// support page
+router.post("/support", verifyToken, support);
+
+// Admin support routes
+router.get("/admin/support", verifyToken, isAdmin, getSupportRequests);
+router.patch("/admin/support/:id", verifyToken, isAdmin, updateSupportStatus);
 
 /* ===========================
 NOTIFICATION ROUTES

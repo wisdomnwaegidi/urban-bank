@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", function () {
     } else if (regex && !regex.test(input.value.trim())) {
       isValid = false;
     }
-    input.style.border = isValid ? "1px solid green" : "1px solid red";
     return isValid;
   };
 
@@ -53,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
           loginForm.reset();
           setTimeout(() => {
             window.location.href = "/dashboard";
-          }, 1500);
+          }, 1000);
         }
       } catch (error) {
         showToast("Something went wrong. Please try again.", "ERROR");

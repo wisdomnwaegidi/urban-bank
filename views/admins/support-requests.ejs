@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <title><%= title %></title>
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+
+  <div class="container">
+    <h1>Support Requests</h1>
+    <% if (requests.length > 0) { %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Issue</th>
+            <th>Status</th>
+            <th>Update</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% requests.forEach(req => { %>
+            <tr>
+              <td><%= req.userId ? req.userId.firstName + " " + req.userId.lastName : "N/A" %></td>
+              <td><%= req.email %></td>
+              <td><%= req.issue %></td>
+              <td><%= req.status %></td>
+              <td>
+                <form method="POST" action="/admin/support/<%= req._id %>/status">
+                  <select name="status" onchange="this.form.submit()">
+                    <option value="Pending" <%= req.status === 'Pending' ? 'selected' : '' %>>Pending</option>
+                    <option value="In Progress" <%= req.status === 'In Progress' ? 'selected' : '' %>>In Progress</option>
+                    <option value="Resolved" <%= req.status === 'Resolved' ? 'selected' : '' %>>Resolved</option>
+                  </select>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } else { %>
+      <p>No support requests yet.</p>
+    <% } %>
+  </div>
+</body>
+</html>

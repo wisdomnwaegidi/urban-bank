@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "nodemon ejs server.js",
     "start-sync": "browser-sync start --proxy \"http://localhost:5179\" --files \"views/**/*.ejs, css/**/*.css, js/**/*.js\"",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "seed:admin": "node scripts/seedAdmin.js"
   },
   "author": "",
   "license": "ISC",
