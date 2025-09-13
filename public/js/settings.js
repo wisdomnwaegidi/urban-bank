@@ -31,31 +31,20 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("Something went wrong while saving settings.", "error");
     }
   });
-  function showToast(message, type = "success") {
-    const toast = document.getElementById("toast");
-    const toastMessage = document.getElementById("toastMessage");
 
-    if (!toast || !toastMessage) return;
-
-    // Reset classes
-    toast.className = "toast";
-
-    // Apply type-specific class
-    if (type === "success") {
-      toast.classList.add("toast-success");
-    } else if (type === "error") {
-      toast.classList.add("toast-error");
-    }
-
-    // Set message
+  // Toast function
+  function showToast(message, type) {
     toastMessage.textContent = message;
-
-    // Show toast
+    toast.className = `toast ${
+      type === "success" ? "toast-success" : "toast-error"
+    } show`;
     toast.style.display = "block";
 
-    // Auto-hide after 4s
     setTimeout(() => {
-      toast.style.display = "none";
+      toast.classList.remove("show");
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 300);
     }, 4000);
   }
 });

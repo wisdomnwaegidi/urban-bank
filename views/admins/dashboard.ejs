@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <header>
+    <h1>Admin Dashboard</h1>
+    <p>Welcome, <%= user.firstName %> (<%= user.role %>)</p>
+  </header>
+
+  <main>
+    <!-- ✅ Pending KYC Requests -->
+    <section>
+      <h2>Pending KYC Requests</h2>
+      <% if (requests && requests.length > 0) { %>
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% requests.forEach(r => { %>
+              <tr id="kyc-<%= r._id %>">
+                <td><%= r.firstName %> <%= r.lastName %></td>
+                <td><%= r.parentsEmail || r.email %></td>
+                <td>
+                  <button onclick="approveKYC('<%= r._id %>')">Approve</button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <p>No pending KYC requests.</p>
+      <% } %>
+    </section>
+
+    <!-- ✅ Load Money -->
+    <section>
+      <h2>Load Money into User Account</h2>
+      <form id="loadMoneyForm">
+        <label>User ID:</label>
+        <input type="text" name="userId" required />
+
+        <label>Amount:</label>
+        <input type="number" name="amount" required />
+
+        <label>Description:</label>
+        <input type="text" name="description" />
+
+        <button type="submit">Credit Account</button>
+      </form>
+      <p id="loadMoneyResult"></p>
+    </section>
+  </main>
+
+  <script>
+    // ✅ Approve KYC
+    async function approveKYC(userId) {
+      const res = await fetch(`/admin/kyc/${userId}/approve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await res.json();
+      alert(data.message);
+      if (res.ok) {
+        document.getElementById(`kyc-${userId}`).remove();
+      }
+    }
+
+    // ✅ Load money
+    document.getElementById("loadMoneyForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const payload = {
+        userId: form.userId.value,
+        amount: form.amount.value,
+        description: form.description.value,
+      };
+
+      const res = await fetch("/admin/load-money", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      document.getElementById("loadMoneyResult").textContent = data.message || "Error";
+    });
+  </script>
+</body>
+</html>

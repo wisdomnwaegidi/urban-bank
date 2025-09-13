@@ -4,7 +4,6 @@ const {
   loginUserValidator,
 } = require("../validators/useValidator");
 const verifyToken = require("../middleware/verifyToken");
-const NotificationService = require("../services/notificationService");
 const {
   registerUser,
   loginUser,
@@ -25,7 +24,7 @@ const {
   internationalTransfer,
   applyForLoan,
   getLoanStatus,
-  mobileDeposit,
+  mobileTransfer,
   updatePassword,
   updatePin,
   updateSettings,
@@ -34,13 +33,11 @@ const {
   cards,
   getCards,
   support,
-} = require("../controller/userController");
-const upload = require("../middleware/multer");
-const isAdmin = require("../middleware/isAdmin");
-const {
   getSupportRequests,
   updateSupportStatus,
 } = require("../controller/userController");
+const upload = require("../middleware/multer");
+const isAdmin = require("../middleware/isAdmin");
 
 const router = express.Router();
 
@@ -50,6 +47,16 @@ const router = express.Router();
 router.get("/", (req, res) => {
   res.render("index", {
     layout: false, // Explicitly disable layout
+    loggedIn: res.locals.loggedIn,
+    user: res.locals.user || null,
+    errors: [],
+    data: {},
+  });
+});
+
+router.get("/index-2", (req, res) => {
+  res.render("index-2", {
+    layout: false,
     loggedIn: res.locals.loggedIn,
     user: res.locals.user || null,
     errors: [],
@@ -182,20 +189,7 @@ router.get(
 
 router.get("/accounts/report", verifyToken, getDateReport);
 
-// router.get("/accounts/report", verifyToken, getReport);
-
 // Cards page
-router.get("/cards", verifyToken, (req, res) => {
-  res.render("cards", {
-    layout: "layout",
-    title: "Cards",
-    user: req.user,
-    loggedIn: true,
-    active: "cards",
-    card: null,
-  });
-});
-
 router.post("/cards/apply", verifyToken, cards);
 
 router.get("/cards", verifyToken, getCards);
@@ -220,18 +214,18 @@ router.get("/transfers/international", verifyToken, (req, res) => {
 
 router.post("/transfers/international", verifyToken, internationalTransfer);
 
-// Mobile deposit
-router.get("/transfers/mobile-deposit", verifyToken, (req, res) => {
+// Mobile transfer
+router.get("/transfers/mobile-transfer", verifyToken, (req, res) => {
   res.render("transfers-mobile", {
     layout: "layout",
-    title: "Mobile Deposit",
+    title: "Mobile Transfer",
     user: req.user,
     loggedIn: true,
     active: "transfers",
   });
 });
 
-router.post("/transfers/mobile-deposit", verifyToken, mobileDeposit);
+router.post("/transfers/mobile-transfer", verifyToken, mobileTransfer);
 
 // History
 router.get("/transfers/history", verifyToken, getTransferHistory);
@@ -317,13 +311,14 @@ router.get("/settings", verifyToken, (req, res) => {
   });
 });
 
+// POST settings
+router.post("/settings", verifyToken, updateSettings);
+
+
 router.post("/security/password", verifyToken, updatePassword);
 
 // updatePin;
 router.post("/security/pin", verifyToken, updatePin);
-
-// POST settings
-router.post("/settings", verifyToken, updateSettings);
 
 // Profile routes
 router.get("/profile", verifyToken, (req, res) => {
@@ -353,98 +348,5 @@ router.patch("/admin/support/:id", verifyToken, isAdmin, updateSupportStatus);
 /* ===========================
 NOTIFICATION ROUTES
 =========================== */
-
-// Get user notifications
-router.get("/notifications", verifyToken, async (req, res) => {
-  try {
-    const { page, limit, unreadOnly } = req.query;
-    const result = await NotificationService.getUserNotifications(req.user.id, {
-      page,
-      limit,
-      unreadOnly: unreadOnly === "true",
-    });
-
-    res.json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch notifications",
-    });
-  }
-});
-
-// Mark notification as read
-router.patch("/notifications/:id/read", verifyToken, async (req, res) => {
-  try {
-    const notification = await NotificationService.markAsRead(
-      req.user.id,
-      req.params.id
-    );
-
-    if (!notification) {
-      return res.status(404).json({
-        success: false,
-        message: "Notification not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      data: notification,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to mark notification as read",
-    });
-  }
-});
-
-// Mark all notifications as read
-router.patch("/notifications/read-all", verifyToken, async (req, res) => {
-  try {
-    await NotificationService.markAllAsRead(req.user.id);
-
-    res.json({
-      success: true,
-      message: "All notifications marked as read",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to mark all notifications as read",
-    });
-  }
-});
-
-// Delete notification
-router.delete("/notifications/:id", verifyToken, async (req, res) => {
-  try {
-    const notification = await NotificationService.deleteNotification(
-      req.user.id,
-      req.params.id
-    );
-
-    if (!notification) {
-      return res.status(404).json({
-        success: false,
-        message: "Notification not found",
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "Notification deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to delete notification",
-    });
-  }
-});
 
 module.exports = router;

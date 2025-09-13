@@ -20,6 +20,7 @@
               <th>Amount</th>
               <th>Status</th>
               <th>Description</th>
+              <th>Beneficiary</th>
             </tr>
           </thead>
           <tbody>
@@ -31,12 +32,14 @@
               <!-- Type -->
               <td><%= tx.type %></td>
 
-              <!-- Amount (always normalized to tx.amount in controller) -->
+              <!-- Amount -->
               <td>
-                <% if (tx.type === "Debit") { %>
-                  -$<%= tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
+                <% if (tx.debit > 0) { %>
+                  -$<%= tx.debit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
+                <% } else if (tx.credit > 0) { %>
+                  +$<%= tx.credit.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
                 <% } else { %>
-                  +$<%= tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) %>
+                  $0.00
                 <% } %>
               </td>
 
@@ -53,6 +56,21 @@
 
               <!-- Description -->
               <td><%= tx.description || "-" %></td>
+
+              <!-- Beneficiaries -->
+              <td>
+                <% if (tx.type === "International" && tx.beneficiaryName) { %>
+                  <%= tx.beneficiaryName %>
+                  <% if (tx.beneficiaryBank) { %> (<%= tx.beneficiaryBank %>) <% } %>
+                <% } else if (tx.type === "Local" && tx.localBeneficiaryName) { %>
+                  <%= tx.localBeneficiaryName %> (<%= tx.localBeneficiaryBank %>)
+                <% } else if (tx.type === "Mobile Deposit" && tx.phoneNumber) { %>
+                  <%= tx.mobileBeneficiaryName ? tx.mobileBeneficiaryName + " - " : "" %>
+                  Mobile: <%= tx.phoneNumber %>
+                <% } else { %>
+                  N/A
+                <% } %>
+              </td>
             </tr>
             <% }) %>
           </tbody>

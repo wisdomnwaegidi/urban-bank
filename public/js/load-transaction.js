@@ -1,4 +1,4 @@
-async function loadRecentTransactions() {
+/* async function loadRecentTransactions() {
   try {
     const res = await fetch("/api/recent-transactions");
     const data = await res.json();
@@ -29,3 +29,4 @@ async function loadRecentTransactions() {
 }
 
 document.addEventListener("DOMContentLoaded", loadRecentTransactions);
+ */

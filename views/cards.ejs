@@ -29,11 +29,15 @@
                 class="card-logo"
               />
             </div>
-            <div class="digits" id="previewNumber">**** **** **** ****</div>
-            <div class="row">
-              <span>CVV: xxx</span>
-              <span>Expiry: xx/xx</span>
+            <!-- cards -->
+            <div class="digits" id="previewNumber">
+              <%= card ? card.number : "**** **** **** ****" %>
             </div>
+            <div class="row">
+              <span>CVV: <%= card ? card.cvv : "xxx" %></span>
+              <span>Expiry: <%= card ? card.expiry : "xx/xx" %></span>
+            </div>
+            <!-- cards -->
             <div class="row name">
               <strong
                 ><%= user ? user.firstName + " " + user.lastName : "Full Name"

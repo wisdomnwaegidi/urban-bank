@@ -4,12 +4,9 @@ const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
-const NotificationService = require("../services/notificationService");
 const Transaction = require("../models/transaction");
-const axios = require("axios");
 const PDFDocument = require("pdfkit");
 const ExcelJS = require("exceljs");
-const API_KEY = process.env.ALPHA_VANTAGE_API_KEY;
 const {
   generateCardNumber,
   generateCVV,
@@ -18,6 +15,7 @@ const {
 const Card = require("../models/cards");
 const Beneficiary = require("../models/beneficiaries");
 const Support = require("../models/support");
+const { sendNotification } = require("../utils/notification");
 
 exports.registerUser = async (req, res) => {
   const errors = validationResult(req);
@@ -119,8 +117,8 @@ exports.loginUser = async (req, res) => {
 
     res.status(200).json({ message: "User loggedin successfully" });
   } catch (error) {
-    // console.error("Error logging in:", error.message);
-    // console.error(error.stack);
+    console.error("Error logging in:", error.message);
+    console.error(error.stack);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -158,7 +156,7 @@ exports.resetPassword = async (req, res) => {
     }
 
     // Hash the new password
-   /*  const salt = await bcrypt.genSalt(10);
+    /*  const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt); */
 
     // Update user's password and clear the reset token fields
@@ -464,12 +462,18 @@ exports.localTransfer = async (req, res) => {
     // Create new Transaction
     const newTx = await Transaction.create({
       userId,
+      type: "Local", // ✅ include type
       date: new Date(),
       description:
         description || `Transfer to ${beneficiaryName} (${beneficiaryBank})`,
       debit: totalDebit,
       credit: 0,
       balance: user.accountBalance,
+
+      // ✅ new fields
+      localBeneficiaryName: beneficiaryName,
+      localBeneficiaryBank: beneficiaryBank,
+      localAccountNumber: beneficiaryAccount,
     });
 
     // Push to refs + history
@@ -489,6 +493,8 @@ exports.localTransfer = async (req, res) => {
       const existing = await Beneficiary.findOne({
         userId,
         accountNumber: beneficiaryAccount,
+        accountName: beneficiaryName,
+        bank: beneficiaryBank,
       });
 
       if (!existing) {
@@ -503,6 +509,13 @@ exports.localTransfer = async (req, res) => {
 
     // ✅ Fetch updated beneficiaries list
     const beneficiaries = await Beneficiary.find({ userId }).lean();
+
+    // Socket.io notification
+    sendNotification(userId, {
+      type: "Local",
+      amount: transferAmount,
+      timestamp: Date.now(),
+    });
 
     res.status(200).json({
       message: "Transfer successful",
@@ -585,7 +598,13 @@ exports.internationalTransfer = async (req, res) => {
     user.transactions.push(transaction._id);
     await user.save();
 
-    //  Always send JSON response
+    // ✅ Send notification with proper values
+    sendNotification(userId, {
+      type: "International",
+      amount: transferAmount,
+      timestamp: transaction.createdAt,
+    });
+
     res.status(200).json({
       message: "Transfer successful",
     });
@@ -597,56 +616,99 @@ exports.internationalTransfer = async (req, res) => {
   }
 };
 
-// POST /transfers/mobile-deposit
-exports.mobileDeposit = async (req, res) => {
+// POST /transfers/mobile
+exports.mobileTransfer = async (req, res) => {
   try {
     const userId = req.user?._id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    const { phoneNumber, amount, description } = req.body;
-    const depositAmount = parseFloat(amount);
+    const {
+      phoneNumber,
+      beneficiaryName,
+      amount,
+      description,
+      saveBeneficiary,
+    } = req.body;
+    const transferAmount = parseFloat(amount);
 
-    if (!depositAmount || depositAmount <= 0) {
-      return res.status(400).json({ message: "Invalid deposit amount" });
+    if (!transferAmount || transferAmount <= 0) {
+      return res.status(400).json({ message: "Invalid transfer amount" });
     }
 
-    // find user
+    // Find user
     const user = await Userdb.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // update balance
-    user.accountBalance += depositAmount;
+    // Charges (optional, same as Local)
+    const charges = 7;
+    const totalDebit = transferAmount + charges;
 
-    // push to embedded transactionsHistory
+    if (user.accountBalance < totalDebit) {
+      return res.status(400).json({ message: "Insufficient funds" });
+    }
+
+    // Deduct balance
+    user.accountBalance -= totalDebit;
+
+    // Create new Transaction
+    const newTx = await Transaction.create({
+      userId,
+      type: "Mobile Transfer", // ✅ renamed
+      phoneNumber,
+      mobileBeneficiaryName: beneficiaryName,
+      description:
+        description || `Mobile transfer to ${beneficiaryName} (${phoneNumber})`,
+      debit: totalDebit,
+      credit: 0,
+      balance: user.accountBalance,
+    });
+
+    // Push to refs + history
+    user.transactions.push(newTx._id);
     user.transactionsHistory.push({
-      date: new Date(),
-      type: "Credit", // ✅ here it's correct for user.transactionsHistory
-      amount: depositAmount,
+      type: "Debit",
+      amount: transferAmount,
       status: "Completed",
-      description: description || `Mobile deposit from ${phoneNumber}`,
+      description:
+        description || `Mobile transfer to ${beneficiaryName} (${phoneNumber})`,
     });
 
     await user.save();
 
-    // also save to Transaction collection
-    await Transaction.create({
-      userId,
-      type: "Mobile Deposit", // ✅ matches Transaction schema enum
-      phoneNumber,
-      description: description || `Mobile deposit from ${phoneNumber}`,
-      debit: 0,
-      credit: depositAmount,
-      balance: user.accountBalance, // ✅ required field
-      status: "Completed",
+    // ✅ Save beneficiary if requested
+    if (saveBeneficiary === "on") {
+      const existing = await Beneficiary.findOne({
+        userId,
+        accountNumber: phoneNumber,
+        name: beneficiaryName,
+        bank: "Mobile",
+      });
+
+      if (!existing) {
+        await Beneficiary.create({
+          userId,
+          name: beneficiaryName,
+          accountNumber: phoneNumber,
+          bank: "Mobile",
+        });
+      }
+    }
+
+    // Socket.io notification
+    sendNotification(userId, {
+      type: "Mobile Transfer",
+      amount: transferAmount,
+      timestamp: Date.now(),
     });
 
     res.status(200).json({
-      message: "Mobile deposit successful",
+      message: "Mobile transfer successful",
       newBalance: user.accountBalance,
+      transactionId: newTx._id,
     });
   } catch (err) {
-    console.error("Mobile deposit error:", err);
-    res.status(500).json({ message: "Error processing deposit" });
+    console.error("Mobile transfer error:", err);
+    res.status(500).json({ message: "Error processing mobile transfer" });
   }
 };
 
@@ -800,49 +862,27 @@ exports.getDateReport = async (req, res) => {
   }
 };
 
-// controllers/transferController.js
+// controllers/transferHistory.js
 exports.getTransferHistory = async (req, res) => {
   try {
-    const user = await Userdb.findById(req.user.id)
-      .populate("transactions") // fetch Transaction docs
+    const userId = req.user?._id;
+    if (!userId) return res.redirect("/login");
+
+    // ✅ Fetch all transactions directly from Transaction collection
+    const transactions = await Transaction.find({ userId })
+      .sort({ date: -1 })
       .lean();
 
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // Local transfers (Transaction model: debit/credit)
-    const localTx = (user.transactions || []).map((tx) => ({
-      date: tx.date,
-      type: tx.debit > 0 ? "Debit" : "Credit",
-      amount: tx.debit > 0 ? tx.debit : tx.credit, // <-- normalize to `amount`
-      status: "Completed",
-      description: tx.description,
-    }));
-
-    // International transfers (transactionsHistory has `amount` already)
-    const intlTx = (user.transactionsHistory || []).map((tx) => ({
-      date: tx.date,
-      type: tx.type,
-      amount: tx.amount,
-      status: tx.status,
-      description: tx.description,
-    }));
-
-    // Merge + sort by date (newest first)
-    const allTransactions = [...localTx, ...intlTx].sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
-    );
-
-    console.log(allTransactions);
-
     res.render("transfers-history", {
-      user,
-      transactions: allTransactions.slice(0, 50),
+      user: req.user,
+      transactions,
     });
   } catch (err) {
     console.error("Error fetching transfer history:", err);
-    res.status(500).json({ message: "Error fetching transfer history" });
+    res.status(500).send("Server Error");
   }
 };
+
 
 // GET /accounts/statement/export/pdf
 exports.exportStatementPDF = async (req, res) => {
@@ -935,12 +975,14 @@ exports.exportStatementExcel = async (req, res) => {
 // Overview hardcoded data and API integration
 exports.getOverview = async (req, res) => {
   try {
-    const user = await Userdb.findById(req.user.id);
+    const user = await Userdb.findById(req.user.id)
+      .populate("transactions") // 👈 this loads actual Transaction docs
+      .lean();
 
-    // Last 5 transactions
-    const transactions = user.transactions.slice(-5).reverse();
+    const transactions = user.transactions
+      ? user.transactions.slice(-5).reverse()
+      : [];
 
-    // Dummy data for now (replace with API or DB later)
     const tickers = [
       { name: "EUR to USD", value: "1.16486", change: "+0.01%" },
       { name: "Bitcoin", value: "110,859", change: "-0.81%" },
@@ -965,80 +1007,16 @@ exports.getOverview = async (req, res) => {
 
     res.render("overview", {
       user,
-      transactions,
       tickers,
       indices,
       currentIndices,
+      transactions, // 👈 pass this
     });
   } catch (err) {
     console.error("Error loading overview:", err);
     res.status(500).send("Error loading overview");
   }
 };
-
-async function fetchForexRate(from, to) {
-  const res = await axios.get("https://www.alphavantage.co/query", {
-    params: {
-      function: "CURRENCY_EXCHANGE_RATE",
-      from_currency: from,
-      to_currency: to,
-      apikey: API_KEY,
-    },
-  });
-  return (
-    res.data["Realtime Currency Exchange Rate"]?.["5. Exchange Rate"] || "--"
-  );
-}
-
-async function fetchCryptoPrice(symbol) {
-  const res = await axios.get("https://www.alphavantage.co/query", {
-    params: {
-      function: "CURRENCY_EXCHANGE_RATE",
-      from_currency: symbol,
-      to_currency: "USD",
-      apikey: API_KEY,
-    },
-  });
-  return (
-    res.data["Realtime Currency Exchange Rate"]?.["5. Exchange Rate"] || "--"
-  );
-}
-
-async function fetchStockIndex(ticker) {
-  const res = await axios.get("https://www.alphavantage.co/query", {
-    params: {
-      function: "GLOBAL_QUOTE",
-      symbol: ticker,
-      apikey: API_KEY,
-    },
-  });
-  return res.data["Global Quote"]?.["05. price"] || "--";
-}
-
-/* exports.getOverview = async (req, res) => {
-  try {
-    const user = await Userdb.findById(req.user.id);
-    const transactions = user.transactions?.slice(-5).reverse() || [];
-
-    const tickers = [
-      { name: "EUR/USD", value: await fetchForexRate("EUR", "USD") },
-      { name: "BTC/USD", value: await fetchCryptoPrice("BTC") },
-      { name: "ETH/USD", value: await fetchCryptoPrice("ETH") },
-    ];
-
-    const indices = [
-      { label: "S&P 500", value: await fetchStockIndex("SPY") },
-      { label: "Dow Jones", value: await fetchStockIndex("^DJI") },
-      { label: "NASDAQ", value: await fetchStockIndex("^IXIC") },
-    ];
-
-    res.render("overview", { user, transactions, tickers, indices });
-  } catch (err) {
-    console.error("Error fetching overview:", err);
-    res.status(500).send("Error loading overview");
-  }
-}; */
-// End Overview hardcoded data and API integration
 
 // POST /loan/application controller
 exports.applyForLoan = async (req, res) => {
@@ -1125,7 +1103,7 @@ exports.updatePassword = async (req, res) => {
       return res.status(400).json({ message: "Current password is incorrect" });
     }
 
-    user.password = newPassword
+    user.password = newPassword;
 
     await user.save();
 
@@ -1139,23 +1117,45 @@ exports.updatePassword = async (req, res) => {
 // Update PIN
 exports.updatePin = async (req, res) => {
   try {
-    const { currentPin, newPin } = req.body;
+    const { currentPin, newPin, confirmPin } = req.body;
     const userId = req.user?._id;
 
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
-
-    const user = await Userdb.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    // Check current PIN only if user already has one
-    if (user.pin) {
-      const isMatch = await user.comparePin(currentPin);
-      if (!isMatch) {
-        return res.status(400).json({ message: "Current PIN is incorrect" });
-      }
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // Set new PIN (pre-save hook will hash it)
+    if (!currentPin || !newPin || !confirmPin) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (newPin !== confirmPin) {
+      return res.status(400).json({ message: "New pins do not match" });
+    }
+
+    if (newPin.length < 4) {
+      return res
+        .status(400)
+        .json({ message: "PIN should be at least 4 digits" });
+    }
+
+    const user = await Userdb.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Compare current PIN with stored hashed PIN
+    const isMatch = await bcrypt.compare(currentPin, user.pin || "");
+    if (!isMatch) {
+      return res.status(400).json({ message: "Current PIN is incorrect" });
+    }
+
+    if (await bcrypt.compare(newPin, user.pin)) {
+      return res
+        .status(400)
+        .json({ message: "New PIN must be different from current PIN" });
+    }
+
+    // Assign new PIN (it will be hashed by pre-save hook)
     user.pin = newPin;
     await user.save();
 
@@ -1166,11 +1166,10 @@ exports.updatePin = async (req, res) => {
   }
 };
 
-
 // settings
 exports.updateSettings = async (req, res) => {
   try {
-    const userId = Userdb.findById(req.user.id); // from JWT middleware
+    const userId = req.user ? req.user._id : null; // from JWT middleware
     const { theme, language } = req.body;
 
     const user = await Userdb.findByIdAndUpdate(
@@ -1202,10 +1201,13 @@ exports.updateSettings = async (req, res) => {
   }
 };
 
-// POST /api/cards/apply
+// POST /cards/apply
 exports.cards = async (req, res) => {
   try {
     const { network, type } = req.body;
+
+    console.log(req.body);
+
     const userId = req.user ? req.user._id : null;
 
     if (!userId) {
@@ -1233,24 +1235,30 @@ exports.cards = async (req, res) => {
   }
 };
 
+// GET cards
 exports.getCards = async (req, res) => {
   try {
-    const cards = await Card.find({ userId: req.user._id }).lean();
-    res.json({
-      success: true,
-      cards,
-      userFullName: `${req.user.firstName} ${req.user.lastName}`,
+    const userId = req.user._id;
+    const card = await Card.findOne({ userId }).lean(); // get card for this user
+
+    res.render("cards", {
+      layout: "layout",
+      title: "Cards",
+      user: req.user,
+      card,
+      loggedIn: true,
+      active: "cards",
     });
   } catch (err) {
-    console.error("Error fetching cards:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("Error loading cards:", err);
+    res.status(500).send("Server error");
   }
 };
 
-// support
+// support controller
 exports.support = async (req, res) => {
   try {
-    const user = await Userdb.findById(req.user.id); // req.user comes from JWT middleware
+    const user = await Userdb.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -1258,9 +1266,7 @@ exports.support = async (req, res) => {
     const { email, issue } = req.body;
 
     if (!email || !issue) {
-      return res
-        .status(400)
-        .json({ success: false, message: "All fields required" });
+      return res.status(400).json({ message: "All fields required" });
     }
 
     const support = new Support({
@@ -1270,12 +1276,10 @@ exports.support = async (req, res) => {
     });
     await support.save();
 
-    res
-      .status(201)
-      .json({ success: true, message: "Support request submitted" });
+    res.status(201).json({ message: "Support request submitted" });
   } catch (err) {
     console.error("Support error:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -1313,48 +1317,18 @@ exports.updateSupportStatus = async (req, res) => {
     );
 
     if (!updated) {
-      return res.status(404).json({ success: false, message: "Support request not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Support request not found" });
     }
-
-    res.json({ success: true, message: "Support status updated", request: updated });
-  } catch (err) {
-    console.error("Error updating support status:", err);
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
-};
-
-// ===========================
-// server/controller/transactionController.js (Example usage)
-// ===========================
-
-const processWithdrawal = async (req, res) => {
-  try {
-    const { userId, amount, accountNumber, location, method } = req.body;
-
-    // Process the actual withdrawal logic here
-    // ... your withdrawal processing code ...
-
-    const transactionId = generateTransactionId(); // Your transaction ID logic
-
-    // Create withdrawal notification
-    await NotificationService.createWithdrawalNotification(userId, {
-      amount,
-      accountNumber,
-      location: location || req.ip, // Use IP if location not provided
-      method: method || "ATM",
-      transactionId,
-    });
 
     res.json({
       success: true,
-      message: "Withdrawal processed successfully",
-      transactionId,
+      message: "Support status updated",
+      request: updated,
     });
-  } catch (error) {
-    console.error("Withdrawal processing error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Withdrawal processing failed",
-    });
+  } catch (err) {
+    console.error("Error updating support status:", err);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };

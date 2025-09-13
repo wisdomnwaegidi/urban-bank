@@ -22,11 +22,12 @@
     />
 
     <!-- Styles -->
-    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/layout.css" />
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body
     data-theme="<%= user && user.settings ? user.settings.theme : 'light' %>"
+    data-user-id="<%= user._id %>"
   >
     <!-- Sidebar -->
     <aside class="sidebar" aria-label="Primary">
@@ -82,7 +83,13 @@
             >
           </li>
           <% if (user && user.role === 'admin') { %>
-          <li><a href="/admin/support" class="nav-link <%= typeof active !== 'undefined' && active === 'support' ? 'active' : '' %>">Support Tickets</a></li>
+          <li>
+            <a
+              href="/admin/support"
+              class="nav-link <%= typeof active !== 'undefined' && active === 'support' ? 'active' : '' %>"
+              >Support Tickets</a
+            >
+          </li>
           <% } %>
           <li class="has-submenu">
             <a
@@ -105,8 +112,8 @@
                 </a>
               </li>
               <li>
-                <a href="/transfers/mobile-deposit" class="submenu-link">
-                  <i class="fa fa-angle-right"></i> Mobile Deposit
+                <a href="/transfers/mobile-transfer" class="submenu-link">
+                  <i class="fa fa-angle-right"></i> Mobile transfer
                 </a>
               </li>
               <li>
@@ -206,14 +213,41 @@
           </button>
         </form>
 
-        <!-- notification icon -->
         <div class="topbar__right">
-          <button class="icon-btn" aria-label="Notifications" id="notifyBtn">
-            <i class="fa fa-bell-o"></i
-            ><span class="dot" aria-hidden="true"></span>
-          </button>
+          <!-- notification icon -->
+          <div class="notif-wrapper" style="position: relative">
+            <button class="icon-btn" aria-label="Notifications" id="notifyBtn">
+              <i class="fa fa-bell-o"></i>
+              <span
+                id="notifBadge"
+                style="
+                  display: none;
+                  position: absolute;
+                  top: 4px;
+                  right: 4px;
+                  background: red;
+                  color: white;
+                  font-size: 11px;
+                  font-weight: bold;
+                  border-radius: 50%;
+                  padding: 2px 6px;
+                  line-height: 1;
+                "
+              ></span>
+            </button>
 
-          <!--  Profile button-->
+            <!-- dropdown -->
+            <div
+              id="notifDropdown"
+              class="notif-dropdown"
+              style="display: none; position: absolute; right: 0; top: 50px"
+            >
+              <ul id="notifList"></ul>
+              <button id="clearNotif" class="btn-small">Clear All</button>
+            </div>
+          </div>
+
+          <!-- Profile button -->
           <div class="profile">
             <button
               class="profile__btn"
@@ -259,10 +293,9 @@
       <!-- Main -->
       <main class="content" id="content">
         <!-- Toast -->
-        <%- include('partials/toast') %> <%- include('partials/dashboard-toast')
-        %>
+        <%- include('partials/toast') %>
 
-        <!-- Page content will be inserted here -->
+        <!-- Page content -->
         <%- body %>
       </main>
 
@@ -285,7 +318,7 @@
           &times;
         </button>
         <h2 id="supportTitle" class="support__title">Support Request</h2>
-        <form id="supportForm">
+        <form id="supportForm" novalidate>
           <label for="issue">Describe your issue:</label>
           <textarea id="issue" name="issue" rows="5" required></textarea>
 
@@ -303,9 +336,24 @@
       </div>
     </div>
 
+    <!-- Notification container -->
+    <div
+      id="notifications"
+      style="
+        position: fixed;
+        top: 70px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 320px;
+      "
+    ></div>
+
     <!-- Scripts -->
     <script src="/js/layout.js"></script>
     <script src="/js/support.js"></script>
-    <script src="/js/dashboardToast.js"></script>
+
+    <!-- Socket.IO client -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/socket-client.js"></script>
   </body>
 </html>

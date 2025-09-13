@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const previewLogo = document.getElementById("previewLogo");
   const previewType = document.getElementById("previewType");
 
+
+// get network logo
   function getNetworkLogo(network) {
     switch ((network || "").toLowerCase()) {
       case "mastercard":
@@ -19,6 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // get network
   function updatePreview() {
     const network = networkSelect.value;
     const type = typeSelect.value;
@@ -86,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Toast function// Toast function
+ // Toast function
   function showToast(message, type) {
     const toast = document.getElementById("toast");
     const toastMessage = document.getElementById("toastMessage");

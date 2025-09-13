@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const description = document.getElementById("description").value.trim();
 
     try {
-      const res = await fetch("/transfers/mobile-deposit", {
+      const res = await fetch("/transfers/mobile-transfer", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast("An error occurred. Please try again.", "error");
     }
   });
-  
+
   // Reuse your global toast function
   function showToast(message, type) {
     const toast = document.getElementById("toast");

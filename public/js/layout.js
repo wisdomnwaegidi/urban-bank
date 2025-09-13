@@ -1,6 +1,3 @@
-
-
-
 // Profile dropdown toggle
 function attachProfileListeners() {
   const profile = document.querySelector(".profile");
@@ -33,35 +30,12 @@ function attachLogoutListener() {
     e.preventDefault();
 
     // Client-side toast
-  toast("Logging out…", "info");
+    showToast("Logging out…", "success");
 
     // Redirect to backend logout route
     window.location.href = "/logout";
   });
 }
-
-// Toast notification system
-/* function showToast(message, type) {
-  const toast = document.getElementById("toast");
-  const toastMessage = document.getElementById("toastMessage");
-  if (!toast || !toastMessage) return;
-
-  toastMessage.textContent = message;
-  toast.className = "toast"; // reset
-  toast.classList.add(type === "success" ? "toast-success" : "toast-error");
-  toast.classList.remove("hidden");
-  toast.style.display = "block";
-
-  setTimeout(() => toast.classList.add("show"), 10);
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => {
-      toast.classList.add("hidden");
-      toast.style.display = "none";
-    }, 300);
-  }, 4000);
-} */
 
 // CLICK-ONLY Sidebar submenu toggle
 function attachSubmenuListeners() {
@@ -200,26 +174,13 @@ function attachSearchListener() {
 
     if (query) {
       console.log("Searching for:", query);
-     toast(`Searching for: ${query}`, "info");
+      toast(`Searching for: ${query}`, "info");
 
       // Example: redirect to search results page
       // window.location.href = `/search?q=${encodeURIComponent(query)}`;
     } else {
-     toast("Please enter a search query", "info");
+      toast("Please enter a search query", "info");
     }
-  });
-}
-
-// Initialize notification system
-function initNotifications() {
-  const notifyBtn = document.getElementById("notifyBtn");
-
-  if (!notifyBtn) return;
-
-  notifyBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    console.log("Notification button clicked");
-    toast("Notifications feature coming soon", "info");
   });
 }
 
@@ -293,12 +254,21 @@ modalOverlay.addEventListener("click", () => {
   supportModal.setAttribute("aria-hidden", "true");
 });
 
-// Optional: Handle form submission
-document.getElementById("supportForm").addEventListener("submit", (e) => {
-  e.preventDefault();
-  alert("Support request submitted!"); // Replace with actual submission logic
-  supportModal.style.display = "none";
-});
+// Toast function
+function showToast(message, type) {
+  toastMessage.textContent = message;
+  toast.className = `toast ${
+    type === "success" ? "toast-success" : "toast-error"
+  } show`;
+  toast.style.display = "block";
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      toast.style.display = "none";
+    }, 300);
+  }, 4000);
+}
 
 // Attach all listeners when DOM is ready
 document.addEventListener("DOMContentLoaded", () => {
@@ -309,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
   attachMobileMenuListener();
   attachSearchListener();
   attachKeyboardListeners();
-  initNotifications();
+  // initNotifications();
   setActiveNav();
 
   // Set current year in footer

@@ -179,7 +179,7 @@ body {
   z-index: 1000;
 }
 .modal-content {
-  background: var(--bg_card);
+  background: var(--border_color_2);
   padding: 25px;
   border-radius: 12px;
   width: 320px;

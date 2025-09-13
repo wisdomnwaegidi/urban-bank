@@ -3,13 +3,17 @@
 <!-- Welcome -->
 <section class="welcome">
   <h1>
-    Welcome <% if (user && user.firstName && user.lastName) { %> <%= user.firstName +
-      " " + user.lastName %> <% } else { %> User <% } %>
+    Welcome 
+    <% if (user && user.firstName && user.lastName) { %> 
+      <%= user.firstName + " " + user.lastName %> 
+    <% } else { %> 
+      User 
+    <% } %>
   </h1>
   <marquee behavior="" direction="">
     <div class="market-ticker">
       <% tickers.forEach(t => { %>
-      <span><%= t.name %>: <%= t.value %></span>
+        <span><%= t.name %>: <%= t.value %></span>
       <% }) %>
     </div>
   </marquee>
@@ -21,8 +25,11 @@
     <h2>Receive Money</h2>
     <p>
       <strong>Account Name:</strong>
-      <% if (user && user.firstName && user.lastName) { %> <%= user.firstName +
-      " " + user.lastName %> <% } else { %> User <% } %>
+      <% if (user && user.firstName && user.lastName) { %> 
+        <%= user.firstName + " " + user.lastName %> 
+      <% } else { %> 
+        User 
+      <% } %>
     </p>
     <p>
       <strong>Account Number:</strong>
@@ -37,15 +44,14 @@
     </p>
     <p>AVAILABLE BALANCE</p>
     <div class="balance">
-      $<%= user && user.accountBalance ? user.accountBalance.toLocaleString() :
-      "0.00" %>
+      $<%= user && user.accountBalance ? user.accountBalance.toLocaleString() : "0.00" %>
     </div>
   </article>
 
   <article class="card">
     <h2>Our Rates</h2>
     <% indices.forEach(idx => { %>
-    <p><%= idx.label %>: <%= idx.value %></p>
+      <p><%= idx.label %>: <%= idx.value %></p>
     <% }) %>
   </article>
 </section>
@@ -65,19 +71,20 @@
         </tr>
       </thead>
       <tbody>
-        <% if (currentIndices && currentIndices.length > 0) { %> <%
-        currentIndices.forEach(row => { %>
-        <tr>
-          <td><%= row.EUR %></td>
-          <td><%= row.USD %></td>
-          <td><%= row.GBP %></td>
-          <td><%= row.CAD %></td>
-          <td><%= row.CNY %></td>
-        </tr>
-        <% }) %> <% } else { %>
-        <tr>
-          <td colspan="5">No indices available</td>
-        </tr>
+        <% if (currentIndices && currentIndices.length > 0) { %> 
+          <% currentIndices.forEach(row => { %>
+            <tr>
+              <td><%= row.EUR %></td>
+              <td><%= row.USD %></td>
+              <td><%= row.GBP %></td>
+              <td><%= row.CAD %></td>
+              <td><%= row.CNY %></td>
+            </tr>
+          <% }) %> 
+        <% } else { %>
+          <tr>
+            <td colspan="5">No indices available</td>
+          </tr>
         <% } %>
       </tbody>
     </table>
@@ -95,13 +102,17 @@
           <th>Amount</th>
           <th>Type</th>
           <th>Date</th>
+          <th>Beneficiaries</th>
         </tr>
       </thead>
       <tbody>
         <% if (transactions && transactions.length > 0) { %>
           <% transactions.forEach(tx => { %>
             <tr>
+              <!-- Account -->
               <td><%= user.account %></td>
+
+              <!-- Amount -->
               <td>
                 <% if (tx.debit > 0) { %>
                   -$<%= tx.debit.toLocaleString() %>
@@ -111,6 +122,8 @@
                   $0.00
                 <% } %>
               </td>
+
+              <!-- Type -->
               <td>
                 <% if (tx.debit > 0) { %>
                   <span class="badge badge-danger">Debit</span>
@@ -120,17 +133,33 @@
                   <span class="badge">N/A</span>
                 <% } %>
               </td>
+
+              <!-- Date -->
               <td><%= new Date(tx.date).toLocaleString() %></td>
+
+              <!-- Beneficiaries -->
+              <td>
+                <% if (tx.type === "International" && tx.beneficiaryName) { %>
+                  <%= tx.beneficiaryName %>
+                  <% if (tx.beneficiaryBank) { %>(<%= tx.beneficiaryBank %>)<% } %>
+                <% } else if (tx.type === "Local" && tx.localBeneficiaryName) { %>
+                  <%= tx.localBeneficiaryName %>
+                  <% if (tx.localBeneficiaryBank) { %>(<%= tx.localBeneficiaryBank %>)<% } %>
+                <% } else if (tx.type === "Mobile Transfer" && tx.phoneNumber) { %>
+                  <%= tx.mobileBeneficiaryName ? tx.mobileBeneficiaryName + " - " : "" %>
+                  Mobile: <%= tx.phoneNumber %>
+                <% } else { %>
+                  N/A
+                <% } %>
+              </td>
             </tr>
           <% }) %>
         <% } else { %>
           <tr>
-            <td colspan="4">No recent transactions</td>
+            <td colspan="5">No recent transactions</td>
           </tr>
         <% } %>
       </tbody>
     </table>
   </div>
 </section>
-
-<script src="/js/load-transaction.js"></script>
