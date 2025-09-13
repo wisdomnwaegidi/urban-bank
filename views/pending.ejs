@@ -1,0 +1,42 @@
+<section class="admin-section">
+  <h2>Pending User Registrations</h2>
+  <% if (requests.length > 0) { %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% requests.forEach(r => { %>
+      <tr id="user-<%= r._id %>">
+        <td><%= r.firstName %> <%= r.lastName %></td>
+        <td><%= r.email %></td>
+        <td>
+          <button onclick="approveUser('<%= r._id %>')" class="btn-approve">
+            Approve
+          </button>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <p>No pending registrations.</p>
+  <% } %>
+</section>
+
+<script>
+  async function approveUser(userId) {
+    const res = await fetch(`/admin/approve-user/${userId}`, {
+      method: "POST",
+    });
+    const data = await res.json();
+    alert(data.message);
+    if (res.ok) {
+      document.getElementById(`user-${userId}`).remove();
+    }
+  }
+</script>

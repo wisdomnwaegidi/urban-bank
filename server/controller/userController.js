@@ -15,7 +15,10 @@ const {
 const Card = require("../models/cards");
 const Beneficiary = require("../models/beneficiaries");
 const Support = require("../models/support");
-const { sendNotification } = require("../utils/notification");
+const {
+  sendNotification,
+  broadcastNewRegistration,
+} = require("../utils/notification");
 
 exports.registerUser = async (req, res) => {
   const errors = validationResult(req);
@@ -27,12 +30,10 @@ exports.registerUser = async (req, res) => {
     const { firstName, lastName, email, phone, password, confirmPassword } =
       req.body;
 
-    // Check if passwords match
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    // Check for existing user
     const userExists = await Userdb.findOne({
       $or: [{ email }, { phone }],
     });
@@ -46,33 +47,32 @@ exports.registerUser = async (req, res) => {
       });
     }
 
-    // Create user
+    // ✅ Create user with pending status
     const user = new Userdb({
       firstName,
       lastName,
       email,
       phone,
       password,
+      status: "pending", // This will show in admin dashboard
     });
 
     const savedUser = await user.save();
 
-    // Generate token
-    const token = jwt.sign(
-      { userId: savedUser._id },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "1d" }
-    );
-
-    // Set cookie
-    res.cookie("auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 86400000,
+    // ✅ Broadcast to all connected admin clients
+    broadcastNewRegistration({
+      id: savedUser._id,
+      firstName: savedUser.firstName,
+      lastName: savedUser.lastName,
+      email: savedUser.email,
+      phone: savedUser.phone,
     });
 
-    res.status(201).json({ message: "User registered successfully" });
+    // ✅ DON'T set auth cookie for pending users - they can't access dashboard yet
+    res.status(201).json({
+      message:
+        "Registration successful! Please wait for admin approval before you can login.",
+    });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ message: "Server error while creating user" });
@@ -82,10 +82,7 @@ exports.registerUser = async (req, res) => {
 exports.loginUser = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).render("login", {
-      errors: errors.array(),
-      data: req.body,
-    });
+    return res.status(400).json({ errors: errors.array() });
   }
 
   try {
@@ -94,14 +91,26 @@ exports.loginUser = async (req, res) => {
     const user = await Userdb.findOne({ email });
 
     if (!user) {
-      return res.status(401).json({ message: "Incorrect email or username" });
+      return res.status(401).json({ message: "Incorrect email or password" });
+    }
+
+    // ✅ Check if user is approved using status field
+    if (user.status !== "approved") {
+      if (user.status === "pending") {
+        return res.status(403).json({
+          message: "Account is pending admin approval. Please wait.",
+        });
+      } else if (user.status === "rejected") {
+        return res.status(403).json({
+          message: "Account has been rejected. Please contact support.",
+        });
+      }
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-      console.error("Incorrect password for email:", email);
-      return res.status(401).json({ message: "Incorrect password" });
+      return res.status(401).json({ message: "Incorrect email or password" });
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
@@ -115,10 +124,9 @@ exports.loginUser = async (req, res) => {
       sameSite: "Strict",
     });
 
-    res.status(200).json({ message: "User loggedin successfully" });
+    res.status(200).json({ message: "Login successful!" });
   } catch (error) {
-    console.error("Error logging in:", error.message);
-    console.error(error.stack);
+    console.error("Error logging in:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -154,10 +162,6 @@ exports.resetPassword = async (req, res) => {
         .status(400)
         .json({ error: "Password reset token is invalid or has expired" });
     }
-
-    // Hash the new password
-    /*  const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(newPassword, salt); */
 
     // Update user's password and clear the reset token fields
     user.password = newPassword;
@@ -361,6 +365,12 @@ exports.newsLetter = async (req, res) => {
 
   try {
     const { email } = req.body;
+
+    const user = await Userdb.findById(req.user.id);
+
+    if (!user) {
+      return res.status(400).json({ message: "User doesn't exist" });
+    }
 
     const suscribeNewsletter = new Newsletter({
       email,
@@ -883,7 +893,6 @@ exports.getTransferHistory = async (req, res) => {
   }
 };
 
-
 // GET /accounts/statement/export/pdf
 exports.exportStatementPDF = async (req, res) => {
   try {
@@ -973,48 +982,69 @@ exports.exportStatementExcel = async (req, res) => {
 };
 
 // Overview hardcoded data and API integration
+// In your userController.js - getOverview function
+// This version works with your current verifyToken middleware
+
 exports.getOverview = async (req, res) => {
   try {
-    const user = await Userdb.findById(req.user.id)
-      .populate("transactions") // 👈 this loads actual Transaction docs
-      .lean();
+    // ✅ Check if user is authenticated
+    if (!req.user) {
+      console.log("User not authenticated, redirecting to login");
+      return res.redirect("/login");
+    }
 
-    const transactions = user.transactions
-      ? user.transactions.slice(-5).reverse()
-      : [];
+    // ✅ Check if user is approved
+    if (req.user.status !== "approved") {
+      console.log("User not approved, status:", req.user.status);
+      return res.render("pending-approval", {
+        title: "Account Pending Approval",
+        message: "Your account is pending admin approval. Please wait."
+      });
+    }
 
+    const userId = req.user._id;
+    console.log("Getting overview for user:", userId);
+
+    // Get recent transactions
+    const transactions = await Transaction.find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    // Mock data for tickers and indices (you can replace with real data)
     const tickers = [
-      { name: "EUR to USD", value: "1.16486", change: "+0.01%" },
-      { name: "Bitcoin", value: "110,859", change: "-0.81%" },
-    ];
-
-    const currentIndices = [
-      { EUR: "-0.01%", USD: "0.01%", GBP: "0.01%", CAD: "0.01%", CNY: "0%" },
-      {
-        EUR: "0.01%",
-        USD: "0.01%",
-        GBP: "-0.01%",
-        CAD: "-0.01%",
-        CNY: "-0.01%",
-      },
+      { name: "EUR/USD", value: "1.0523" },
+      { name: "GBP/USD", value: "1.2145" },
+      { name: "USD/JPY", value: "149.85" },
+      { name: "AUD/USD", value: "0.6523" }
     ];
 
     const indices = [
-      { label: "S&P 500", value: "0.01%" },
-      { label: "Dow Jones", value: "0.01%" },
-      { label: "NASDAQ", value: "-0.01%" },
+      { label: "USD/EUR", value: "0.9503" },
+      { label: "USD/GBP", value: "0.8233" },
+      { label: "USD/JPY", value: "149.85" }
     ];
 
+    const currentIndices = [
+      { EUR: "1.0523", USD: "1.0000", GBP: "1.2145", CAD: "1.3456", CNY: "7.2345" }
+    ];
+
+    // Render the overview page
     res.render("overview", {
-      user,
-      tickers,
-      indices,
-      currentIndices,
-      transactions, // 👈 pass this
+      title: "Account Overview",
+      user: req.user,
+      transactions: transactions || [],
+      tickers: tickers,
+      indices: indices,
+      currentIndices: currentIndices
     });
-  } catch (err) {
-    console.error("Error loading overview:", err);
-    res.status(500).send("Error loading overview");
+
+  } catch (error) {
+    console.error("Error in getOverview:", error);
+    res.status(500).render("error", { 
+      title: "Error",
+      message: "Error loading overview",
+      error: process.env.NODE_ENV === 'development' ? error : {}
+    });
   }
 };
 
@@ -1280,55 +1310,5 @@ exports.support = async (req, res) => {
   } catch (err) {
     console.error("Support error:", err);
     res.status(500).json({ message: "Server error" });
-  }
-};
-
-// Admin: Get all support requests
-exports.getSupportRequests = async (req, res) => {
-  try {
-    const requests = await Support.find()
-      .populate("userId", "firstName lastName email")
-      .sort({ createdAt: -1 });
-
-    res.render("/admin/support-requests", {
-      layout: "layout",
-      title: "Support Requests",
-      user: req.user, // from verifyToken
-      loggedIn: true,
-      active: "support",
-      requests,
-    });
-  } catch (err) {
-    console.error("Error fetching support requests:", err);
-    res.status(500).send("Server Error");
-  }
-};
-
-// Admin: Update support request status
-exports.updateSupportStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body; // "Pending", "In Progress", "Resolved"
-
-    const updated = await Support.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
-    );
-
-    if (!updated) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Support request not found" });
-    }
-
-    res.json({
-      success: true,
-      message: "Support status updated",
-      request: updated,
-    });
-  } catch (err) {
-    console.error("Error updating support status:", err);
-    res.status(500).json({ success: false, message: "Server Error" });
   }
 };

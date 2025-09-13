@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Real-time Notifications</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            color: #1d1d1f;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #007AFF;
+        }
+
+        .nav-items {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .notification-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-bell {
+            width: 24px;
+            height: 24px;
+            stroke: #1d1d1f;
+            stroke-width: 2;
+            fill: none;
+            transition: all 0.3s ease;
+        }
+
+        .notification-bell:hover {
+            stroke: #007AFF;
+            transform: scale(1.1);
+        }
+
+        .notification-bell.has-notifications {
+            stroke: #007AFF;
+            animation: ring 0.5s ease-in-out;
+        }
+
+        @keyframes ring {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #FF3B30;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            transform: scale(0);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .notification-badge.show {
+            transform: scale(1);
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            width: 350px;
+            max-height: 400px;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            border: 1px solid #e5e5e7;
+        }
+
+        .notification-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .notification-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e5e5e7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+
+        .clear-all {
+            color: #007AFF;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .clear-all:hover {
+            text-decoration: underline;
+        }
+
+        .notification-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #f5f5f7;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+
+        .notification-item:hover {
+            background: #f5f5f7;
+        }
+
+        .notification-item.unread {
+            background: #f0f8ff;
+            border-left: 3px solid #007AFF;
+        }
+
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #007AFF;
+            border-radius: 50%;
+        }
+
+        .notification-content {
+            margin-left: 16px;
+        }
+
+        .notification-message {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: #1d1d1f;
+        }
+
+        .notification-details {
+            font-size: 0.85rem;
+            color: #86868b;
+        }
+
+        .notification-time {
+            font-size: 0.8rem;
+            color: #86868b;
+            margin-top: 0.5rem;
+        }
+
+        .empty-state {
+            padding: 2rem 1.5rem;
+            text-align: center;
+            color: #86868b;
+        }
+
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border: 1px solid #e5e5e7;
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: #1d1d1f;
+        }
+
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .simulate-btn {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 0.5rem 0;
+            transition: background-color 0.2s ease;
+        }
+
+        .simulate-btn:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Admin Dashboard</div>
+        <nav class="nav-items">
+            <div class="connection-status" id="connectionStatus">
+                <div class="status-dot"></div>
+                <span>Connecting...</span>
+            </div>
+            <div class="notification-container">
+                <svg class="notification-bell" id="notificationBell" viewBox="0 0 24 24">
+                    <path d="M18 8a6 6 0 0 0-6-6 6 6 0 0 0-6 6c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <div class="notification-badge" id="notificationBadge">0</div>
+                
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-header">
+                        <h3 class="notification-title">Notifications</h3>
+                        <button class="clear-all" onclick="clearAllNotifications()">Clear All</button>
+                    </div>
+                    <div class="notification-list" id="notificationList">
+                        <div class="empty-state">No new notifications</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <h1>Welcome to Admin Dashboard</h1>
+        <p>Real-time notifications are now enabled. You'll receive instant updates for important events.</p>
+        
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>Notification System</h3>
+                <p>WebSocket connection status and notification controls.</p>
+                <button class="simulate-btn" onclick="simulateNotification('user')">Simulate User Notification</button>
+                <button class="simulate-btn" onclick="simulateNotification('system')">Simulate System Alert</button>
+                <button class="simulate-btn" onclick="simulateNotification('security')">Simulate Security Warning</button>
+            </div>
+            
+            <div class="card">
+                <h3>System Status</h3>
+                <p>All systems are operational and monitoring for events.</p>
+            </div>
+            
+            <div class="card">
+                <h3>Recent Activity</h3>
+                <p>Monitor user activity and system events in real-time.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        class NotificationSystem {
+            constructor() {
+                this.notifications = [];
+                this.unreadCount = 0;
+                this.isConnected = false;
+                this.reconnectAttempts = 0;
+                this.maxReconnectAttempts = 5;
+                
+                this.initializeElements();
+                this.connectWebSocket();
+                this.setupEventListeners();
+            }
+
+            initializeElements() {
+                this.bell = document.getElementById('notificationBell');
+                this.badge = document.getElementById('notificationBadge');
+                this.dropdown = document.getElementById('notificationDropdown');
+                this.notificationList = document.getElementById('notificationList');
+                this.connectionStatus = document.getElementById('connectionStatus');
+            }
+
+            setupEventListeners() {
+                // Toggle dropdown
+                this.bell.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleDropdown();
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!e.target.closest('.notification-container')) {
+                        this.hideDropdown();
+                    }
+                });
+
+                // Prevent dropdown close when clicking inside
+                this.dropdown.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            }
+
+            connectWebSocket() {
+                try {
+                    // Simulate WebSocket connection (in real implementation, use actual WebSocket URL)
+                    this.simulateWebSocketConnection();
+                } catch (error) {
+                    console.error('WebSocket connection failed:', error);
+                    this.handleConnectionError();
+                }
+            }
+
+            simulateWebSocketConnection() {
+                // Simulate connection delay
+                setTimeout(() => {
+                    this.isConnected = true;
+                    this.updateConnectionStatus(true);
+                    this.reconnectAttempts = 0;
+                    
+                    // Simulate receiving notifications periodically
+                    this.startSimulatedNotifications();
+                }, 1000);
+            }
+
+            startSimulatedNotifications() {
+                // Simulate random notifications for demo purposes
+                setInterval(() => {
+                    if (Math.random() < 0.1) { // 10% chance every 5 seconds
+                        this.simulateRandomNotification();
+                    }
+                }, 5000);
+            }
+
+            simulateRandomNotification() {
+                const types = ['user', 'system', 'security'];
+                const randomType = types[Math.floor(Math.random() * types.length)];
+                this.simulateNotification(randomType);
+            }
+
+            updateConnectionStatus(connected) {
+                const statusElement = this.connectionStatus;
+                const statusText = statusElement.querySelector('span');
+                
+                if (connected) {
+                    statusElement.className = 'connection-status connected';
+                    statusText.textContent = 'Connected';
+                } else {
+                    statusElement.className = 'connection-status disconnected';
+                    statusText.textContent = 'Disconnected';
+                }
+            }
+
+            handleConnectionError() {
+                this.isConnected = false;
+                this.updateConnectionStatus(false);
+                
+                if (this.reconnectAttempts < this.maxReconnectAttempts) {
+                    this.reconnectAttempts++;
+                    setTimeout(() => {
+                        this.connectWebSocket();
+                    }, 3000 * this.reconnectAttempts);
+                }
+            }
+
+            addNotification(notification) {
+                notification.id = Date.now();
+                notification.timestamp = new Date();
+                notification.read = false;
+                
+                this.notifications.unshift(notification);
+                this.unreadCount++;
+                
+                this.updateBadge();
+                this.renderNotifications();
+                this.animateBell();
+                
+                // Show browser notification if permission granted
+                this.showBrowserNotification(notification);
+            }
+
+            updateBadge() {
+                this.badge.textContent = this.unreadCount;
+                
+                if (this.unreadCount > 0) {
+                    this.badge.classList.add('show');
+                    this.bell.classList.add('has-notifications');
+                } else {
+                    this.badge.classList.remove('show');
+                    this.bell.classList.remove('has-notifications');
+                }
+            }
+
+            animateBell() {
+                this.bell.classList.remove('has-notifications');
+                setTimeout(() => {
+                    this.bell.classList.add('has-notifications');
+                }, 10);
+            }
+
+            toggleDropdown() {
+                const isVisible = this.dropdown.classList.contains('show');
+                
+                if (isVisible) {
+                    this.hideDropdown();
+                } else {
+                    this.showDropdown();
+                }
+            }
+
+            showDropdown() {
+                this.dropdown.classList.add('show');
+                this.markAllAsRead();
+            }
+
+            hideDropdown() {
+                this.dropdown.classList.remove('show');
+            }
+
+            markAllAsRead() {
+                this.notifications.forEach(notification => {
+                    notification.read = true;
+                });
+                this.unreadCount = 0;
+                this.updateBadge();
+                this.renderNotifications();
+            }
+
+            clearAllNotifications() {
+                this.notifications = [];
+                this.unreadCount = 0;
+                this.updateBadge();
+                this.renderNotifications();
+            }
+
+            renderNotifications() {
+                if (this.notifications.length === 0) {
+                    this.notificationList.innerHTML = '<div class="empty-state">No new notifications</div>';
+                    return;
+                }
+
+                this.notificationList.innerHTML = this.notifications
+                    .map(notification => this.createNotificationHTML(notification))
+                    .join('');
+            }
+
+            createNotificationHTML(notification) {
+                const timeAgo = this.getTimeAgo(notification.timestamp);
+                const unreadClass = notification.read ? '' : 'unread';
+                
+                return `
+                    <div class="notification-item ${unreadClass}" onclick="notificationSystem.markAsRead(${notification.id})">
+                        <div class="notification-content">
+                            <div class="notification-message">${notification.title}</div>
+                            <div class="notification-details">${notification.message}</div>
+                            <div class="notification-time">${timeAgo}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            markAsRead(notificationId) {
+                const notification = this.notifications.find(n => n.id === notificationId);
+                if (notification && !notification.read) {
+                    notification.read = true;
+                    this.unreadCount = Math.max(0, this.unreadCount - 1);
+                    this.updateBadge();
+                    this.renderNotifications();
+                }
+            }
+
+            getTimeAgo(timestamp) {
+                const now = new Date();
+                const diff = now - timestamp;
+                const minutes = Math.floor(diff / (1000 * 60));
+                
+                if (minutes < 1) return 'Just now';
+                if (minutes < 60) return `${minutes}m ago`;
+                
+                const hours = Math.floor(minutes / 60);
+                if (hours < 24) return `${hours}h ago`;
+                
+                const days = Math.floor(hours / 24);
+                return `${days}d ago`;
+            }
+
+            showBrowserNotification(notification) {
+                if (Notification.permission === 'granted') {
+                    new Notification(notification.title, {
+                        body: notification.message,
+                        icon: '/favicon.ico'
+                    });
+                }
+            }
+
+            simulateNotification(type) {
+                const notifications = {
+                    user: {
+                        title: 'New User Registration',
+                        message: 'A new user has registered and needs approval.',
+                        type: 'user'
+                    },
+                    system: {
+                        title: 'System Update',
+                        message: 'System maintenance completed successfully.',
+                        type: 'system'
+                    },
+                    security: {
+                        title: 'Security Alert',
+                        message: 'Suspicious login attempt detected.',
+                        type: 'security'
+                    }
+                };
+
+                this.addNotification(notifications[type]);
+            }
+        }
+
+        // Initialize notification system
+        const notificationSystem = new NotificationSystem();
+
+        // Helper functions for demo
+        function simulateNotification(type) {
+            notificationSystem.simulateNotification(type);
+        }
+
+        function clearAllNotifications() {
+            notificationSystem.clearAllNotifications();
+        }
+
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    </script>
+</body>
+</html>

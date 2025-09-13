@@ -33,8 +33,6 @@ const {
   cards,
   getCards,
   support,
-  getSupportRequests,
-  updateSupportStatus,
 } = require("../controller/userController");
 const upload = require("../middleware/multer");
 const isAdmin = require("../middleware/isAdmin");
@@ -231,7 +229,6 @@ router.post("/transfers/mobile-transfer", verifyToken, mobileTransfer);
 router.get("/transfers/history", verifyToken, getTransferHistory);
 
 // ==================== LOAN ROUTES ====================
-
 // Loan Application
 router.get("/loan/status", verifyToken, getLoanStatus);
 
@@ -342,11 +339,8 @@ router.put("/profile/:userId/picture", verifyToken, upload, profilePicture);
 router.post("/support", verifyToken, support);
 
 // Admin support routes
-router.get("/admin/support", verifyToken, isAdmin, getSupportRequests);
-router.patch("/admin/support/:id", verifyToken, isAdmin, updateSupportStatus);
+/* router.get("/admin/support", verifyToken, isAdmin, getSupportRequests);
+router.patch("/admin/support/:id", verifyToken, isAdmin, updateSupportStatus); */
 
-/* ===========================
-NOTIFICATION ROUTES
-=========================== */
 
 module.exports = router;

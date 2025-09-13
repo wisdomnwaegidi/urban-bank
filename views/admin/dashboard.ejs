@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/admin-dashboard.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="header-left">
+        <h1>Admin Dashboard</h1>
+        <p>Welcome, <%= user.firstName %> (<%= user.role %>)</p>
+      </div>
+      <div class="header-right">
+        <a href="/admin/logout" class="btn-logout">Logout</a>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <!-- Pending User Registrations -->
+      <section class="admin-section">
+        <h2>Pending User Registrations</h2>
+        <% if (requests.length > 0) { %>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% requests.forEach(r => { %>
+            <tr id="user-<%= r._id %>">
+              <td><%= r.firstName %> <%= r.lastName %></td>
+              <td><%= r.email %></td>
+              <td>
+                <button class="btn-approve" data-userid="<%= r._id %>">
+                  Approve
+                </button>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% } else { %>
+        <p>No pending registrations.</p>
+        <% } %>
+      </section>
+
+      <!-- Load Money Section -->
+      <section class="admin-section">
+        <h2>Load Money into User Account</h2>
+        <form id="loadMoneyForm" class="admin-form">
+          <label>User ID:</label>
+          <input type="text" name="userId" required />
+
+          <label>Amount:</label>
+          <input type="number" name="amount" required />
+
+          <label>Description:</label>
+          <input type="text" name="description" />
+
+          <button type="submit" class="btn-primary">Credit Account</button>
+        </form>
+        <p id="loadMoneyResult" class="form-message"></p>
+      </section>
+    </main>
+
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/admin/admin.js"></script>
+  </body>
+</html>

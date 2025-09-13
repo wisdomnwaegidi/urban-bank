@@ -1,3 +1,6 @@
+// ========================================
+// 1. FIXED USER MODEL (userModel.js)
+// ========================================
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
@@ -19,7 +22,6 @@ const userSchema = new mongoose.Schema(
       unique: true,
       match: [/^\d+$/, "Phone number must contain only digits"],
     },
-
     password: { type: String, required: true },
 
     // 🔐 PIN (hashed)
@@ -75,7 +77,7 @@ const userSchema = new mongoose.Schema(
     },
     account: {
       type: String,
-      match: [/^\d{10}$/, "Account must be exactly 10 digits"], // 👈 fixed at 10 digits
+      match: [/^\d{10}$/, "Account must be exactly 10 digits"],
     },
 
     // KYC verification
@@ -96,7 +98,14 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
 
-    // Transactions history
+    // ✅ USE ONLY ONE APPROVAL FIELD
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+    },
+
+    // Rest of your fields...
     transactions: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -118,7 +127,6 @@ const userSchema = new mongoose.Schema(
       },
     ],
 
-    // User Settings
     settings: {
       theme: {
         type: String,
@@ -132,12 +140,11 @@ const userSchema = new mongoose.Schema(
       },
     },
 
-    // Loan Applications
     loanApplications: [
       {
         loanAmount: { type: Number, required: true },
         purpose: { type: String, required: true, trim: true },
-        term: { type: Number, required: true }, // months
+        term: { type: Number, required: true },
         interest: { type: String, default: "5% per annum" },
         collateral: { type: String, trim: true },
         applicationDate: { type: Date, default: Date.now },
@@ -152,36 +159,30 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 🔒 Pre-save hook for password, pin, currency, and account number
+// Pre-save hook
 userSchema.pre("save", async function (next) {
   try {
-    // Hash password if modified
     if (this.isModified("password")) {
       this.password = await bcrypt.hash(this.password, 10);
     }
 
-    // Hash pin if modified
     if (this.isModified("pin") && this.pin) {
       this.pin = await bcrypt.hash(this.pin, 10);
     }
 
-    // Assign default currency if not provided
     if (!this.currency) {
       this.currency = "DOLLAR";
     }
 
-    // Generate account number if not already set
     if (!this.account) {
       let accountNumber;
       let exists = true;
 
       while (exists) {
-        // Generate a random 10-digit number
         accountNumber = Math.floor(
           1000000000 + Math.random() * 9000000000
         ).toString();
 
-        // Ensure uniqueness
         const existingUser = await mongoose
           .model("Userdb")
           .findOne({ account: accountNumber });
@@ -197,7 +198,6 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-// Method to compare PIN
 userSchema.methods.comparePin = async function (enteredPin) {
   if (!this.pin) {
     throw new Error("PIN is not set for this user");
@@ -205,13 +205,10 @@ userSchema.methods.comparePin = async function (enteredPin) {
   return await bcrypt.compare(enteredPin, this.pin);
 };
 
-
-// Method to compare password
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// temporary clear password after reset
 userSchema.index({ resetPasswordExpires: 1 }, { expireAfterSeconds: 0 });
 
 module.exports = mongoose.model("Userdb", userSchema);

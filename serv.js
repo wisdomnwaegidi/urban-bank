@@ -22,7 +22,7 @@ const server = http.createServer(app);
 // ===== Connect to DB =====
 connectDB();
 
-// ===== Socket.io Middleware =====
+// ===== Socket.io Setup =====
 const io = new Server(server, {
   cors: {
     origin: "*",
@@ -32,13 +32,40 @@ const io = new Server(server, {
 
 initNotification(io);
 
-// ===== Middleware =====
+// ===== Basic Middleware =====
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(helmet());
 app.use(cookieParser());
 app.use(morgan("tiny"));
+
+// ✅ MOVE CSP CONFIGURATION HERE - BEFORE ROUTES
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'", // Allow inline scripts
+          "https://cdnjs.cloudflare.com", // For external libraries
+          "https://cdn.socket.io", // For Socket.IO
+        ],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        connectSrc: [
+          "'self'",
+          "ws:",
+          "wss:", // For WebSocket connections (Socket.IO)
+        ],
+        imgSrc: ["'self'", "data:", "https:"],
+        objectSrc: ["'none'"],
+      },
+    },
+    // You can also disable other helmet features if they cause issues
+    crossOriginEmbedderPolicy: false,
+  })
+);
 
 // ===== Static Files =====
 app.use("/css", express.static(path.resolve(__dirname, "public/css")));
@@ -51,7 +78,7 @@ app.use("/font", express.static(path.resolve(__dirname, "public/font")));
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// ===== Middleware to conditionally use layouts =====
+// ===== Conditional Layout Middleware =====
 const conditionalLayout = (req, res, next) => {
   if (
     req.path.startsWith("/dashboard") ||
@@ -77,30 +104,14 @@ const conditionalLayout = (req, res, next) => {
   }
 };
 
-// Apply conditional layout middleware
 app.use(conditionalLayout);
 
-// Refactor publicRouter to pages without auth
-// Refactor publicRouter pages with auth
-// Refactor publicRouter protected routes with token
-
-// Public routes
+// ===== Routes =====
 const publicRouter = require("./server/routes/router");
 app.use("/", publicRouter);
 app.use("/admin", adminRoute);
 
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-    },
-  })
-);
-
-// ===== Error handler =====
+// ===== Error Handler =====
 app.use((error, req, res, next) => {
   console.error(error.stack);
   res.status(500).send("Something broke!");
@@ -110,4 +121,3 @@ app.use((error, req, res, next) => {
 server.listen(PORT, () => {
   console.log(`🚀 Server running with Socket.IO on http://localhost:${PORT}`);
 });
-

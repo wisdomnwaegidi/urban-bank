@@ -78,11 +78,18 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!res.ok) {
           showToast(data.message || "Registration failed", "error");
         } else {
-          showToast("Registration successful!", "success");
+          // ✅ DON'T redirect to dashboard - user needs approval first
+          showToast(
+            data.message ||
+              "Registration successful! Please wait for admin approval.",
+            "success"
+          );
           registerForm.reset();
+
+          // ✅ Show a pending approval message instead
           setTimeout(() => {
-            window.location.href = "/dashboard";
-          }, 1500);
+            showPendingApprovalMessage();
+          }, 2000);
         }
       } catch (error) {
         console.error("Error:", error);
@@ -93,6 +100,64 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   });
+
+  // ✅ Show pending approval message
+  function showPendingApprovalMessage() {
+    // Create or show a pending approval section
+    const pendingDiv = document.createElement("div");
+    pendingDiv.className = "pending-approval-message";
+    pendingDiv.innerHTML = `
+    <div style="
+      width: 600px;
+      margin: 50px auto;
+      padding: 40px;
+      border-radius: 16px;
+      background: var(--bg_othe_1);
+      border: 1px solid var(--border_color);
+      font-family: var(--font_family_1);
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    ">
+      <h3 style="
+        color: var(--text_green);
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+      ">
+        Registration Successful!
+      </h3>
+      <p style="
+        color: var(--text_paragraph_color);
+        font-size: 1rem;
+        line-height: 1.7;
+        margin-bottom: 35px;
+      ">
+        Your account is pending admin approval. You will receive a notification once your account is approved.
+         Thank you for your patience.
+      </p>
+      <a href="/login"
+         style="
+           display: inline-block;
+           padding: 12px 30px;
+           border-radius: 8px;
+           font-weight: 600;
+           color: var(--text_white);
+           background: var(--bg_gradient);
+           text-decoration: none;
+           transition: all 0.3s ease;
+           color: black;
+         "
+         onmouseover="this.style.background='var(--bg_gradient_hover)'; this.style.transform='scale(1.05)';"
+         onmouseout="this.style.background='var(--bg_gradient)'; this.style.transform='scale(1)';">
+        Go to Login Page
+      </a>
+    </div>
+  `;
+
+    // Replace the form with the pending message
+    registerForm.parentNode.insertBefore(pendingDiv, registerForm);
+    registerForm.style.display = "none";
+  }
 
   // Toast function
   function showToast(message, type) {

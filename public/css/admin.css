@@ -1,0 +1,104 @@
+@import url(style.css);
+
+body {
+  font-family: var(--font_family_1), sans-serif;
+  background: var(--bg_body);
+  color: var(--text_white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.admin-login-section {
+  width: 100%;
+  max-width: 450px;
+  padding: 20px;
+}
+
+.admin-login-card {
+  background: var(--bg_othe_2);
+  border: 1px solid var(--border_color);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+
+.admin-login-title {
+  font-family: var(--font_family_2), sans-serif;
+  font-size: 1.8rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 2rem; /* 👈 bigger gap between header & inputs */
+  background: var(--text_gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.admin-login-form .form-group {
+  margin-bottom: 1.5rem;
+}
+
+.admin-login-form label {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  font-weight: 600;
+}
+
+.admin-login-form input {
+  width: 400px;               /* 👈 extended width */
+  max-width: 100%;
+  padding: 1rem;              /* 👈 bigger padding */
+  border-radius: 10px;
+  border: 1px solid var(--border_color);
+  background: var(--bg_input_color);
+  color: var(--input_color);
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.3s;
+}
+
+.admin-login-form input:focus {
+  border-color: var(--text_hover);
+}
+
+.btn-primary {
+  width: 400px;               /* 👈 same width as inputs */
+  max-width: 100%;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--bg_gradient);
+  color: var(--text_black);
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-family: "Mulish";
+}
+
+.btn-primary:hover {
+  background: var(--bg_gradient_hover);
+}
+
+.message {
+  margin-top: 1rem;
+  padding: 0.7rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  display: none;
+  text-align: center;
+}
+
+.message.error {
+  background: var(--text_red);
+  color: var(--text_white);
+}
+
+.message.success {
+  background: var(--text_green);
+  color: var(--text_white);
+}

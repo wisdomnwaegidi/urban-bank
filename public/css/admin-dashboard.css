@@ -1,0 +1,153 @@
+@import url(style.css);
+
+/* Body */
+body {
+  font-family: var(--font_family_1);
+  margin: 0;
+  padding: 0;
+  background: var(--bg_body);
+  color: var(--text_white);
+}
+
+/* Header */
+.admin-header {
+  background: var(--bg_gradient);
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--border_color);
+}
+
+.header-left h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-family: var(--font_family_2);
+  color: var(--text_black);
+}
+
+.header-left p {
+  margin-top: 0.3rem;
+  color: var(--text_black);
+  font-weight: 600;
+}
+
+.btn-logout {
+  background: var(--text_red);
+  color: var(--text_white);
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.3s;
+}
+
+.btn-logout:hover {
+  opacity: 0.85;
+}
+
+/* Main */
+.admin-main {
+  padding: 2rem;
+  width: 70%;
+  max-width: 900px;
+  margin: auto;
+}
+
+/* Sections */
+.admin-section {
+  background: var(--bg_card);
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.admin-section h2 {
+  margin-bottom: 1rem;
+  font-family: var(--font_family_2);
+}
+
+/* Tables */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border_color);
+  text-align: left;
+}
+
+.admin-table th {
+  background: var(--bg_input_color);
+  color: var(--text_white);
+}
+
+/* Buttons */
+.btn-approve {
+  background: var(--text_green);
+  color: var(--text_white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-family: "Mulish";
+}
+
+.btn-approve:hover {
+  background: #218838;
+}
+
+.btn-primary {
+  background: var(--bg_gradient);
+  border: none;
+  color: var(--text_black);
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: "Mulish";
+}
+
+.btn-primary:hover {
+  background: var(--text_green);
+  color: var(--text_white);
+}
+
+/* Forms */
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-form input {
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid var(--border_color);
+  border-radius: 6px;
+  background: var(--bg_input_color);
+  color: var(--input_color);
+  width: 400px;
+}
+
+.form-message {
+  margin-top: 1rem;
+}
+
+.form-message.success {
+  color: var(--text_green);
+}
+
+.form-message.error {
+  color: var(--text_red);
+}
+
+/* No Data */
+.no-data {
+  color: var(--input_color);
+}
